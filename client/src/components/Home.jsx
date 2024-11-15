@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
 const Home = () => {
 
@@ -97,7 +98,11 @@ const Home = () => {
             </div>
           ))
         ) : (
-          <p>Loading posts...</p>
+
+          <div class="loader-container">
+            <div class="loader"></div>
+          </div>
+
         )}
       </div>
 
@@ -107,7 +112,7 @@ const Home = () => {
         className="btn btn-primary"
         disabled={loading} // disable button if loading is true
       >
-        {loading ? 'Loading...' : 'Load More'} 
+        {loading ? 'Loading...' : 'Load More'}
       </button>}
     </div>
   );
