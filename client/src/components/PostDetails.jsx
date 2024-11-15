@@ -84,7 +84,9 @@ const PostDetails = () => {
           </p>
         </div>
       ) : (
-        <p>Loading post details...</p>
+        <div class="loader-container">
+            <div class="loader"></div>
+          </div>
       )}
     </div>
   );
