@@ -107,13 +107,20 @@ const Home = () => {
       </div>
 
       {/* load More button */}
-      {hasMorePosts && <button
-        onClick={handleLoadMore}
-        className="btn btn-primary"
-        disabled={loading} // disable button if loading is true
-      >
-        {loading ? 'Loading...' : 'Load More'}
-      </button>}
+      {
+        loading ?
+          <div class="loader-container">
+            <div class="loader"></div>
+          </div>
+          :
+          hasMorePosts && <button
+            onClick={handleLoadMore}
+            className="btn btn-primary"
+          >
+            Load More
+          </button>
+
+      }
     </div>
   );
 };
