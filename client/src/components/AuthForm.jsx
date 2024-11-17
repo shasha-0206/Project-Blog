@@ -18,20 +18,27 @@ function AuthForm({ mode = 'login', onAuthSuccess }) {
         
             const response = await axios.post(url, { username, email, password });
 
-            const json = response.data;;
-           if(json.success){
-            localStorage.setItem('token', json.authtoken); 
+            const json = response.data;
 
-            // for rendering logout or profile
-            localStorage.setItem('isLoggedIn', 'true');
-        
-            setSuccess(json.message);
-            
-            // using this mthod so that the home page is reloaded after successful login or signup
-            window.location.href = '/';
-           }
-           else{
-            alert("Invalid credentials");
+            try{
+
+                if(json.success){
+                    localStorage.setItem('token', json.authtoken); 
+                    
+                    // for rendering logout or profile
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    setSuccess(json.message);
+                    
+                    // using this mthod so that the home page is reloaded after successful login or signup
+                    window.location.href = '/';
+                }
+                else{
+                    setError("Invalid credentials");
+            }
+        }
+        catch(err){
+            setError(`Error: ${err}`)
         }    
        
     };

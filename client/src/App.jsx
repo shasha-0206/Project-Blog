@@ -7,12 +7,14 @@ import Home from "./components/Home";
 import PostDetails from "./components/PostDetails";
 import EditPost from "./components/EditPost";
 import ProfilePage from './components/ProfilePage';
+import ScrollToTop from "./components/ScrollTop";
 
 const App = () => {
 
 
     return (
         <Router>
+            <ScrollToTop />
             <Navbar /> {/* Navbar is always visible */}
             
             <Routes>
