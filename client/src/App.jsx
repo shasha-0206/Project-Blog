@@ -6,6 +6,7 @@ import Editor from './components/Editor';
 import Home from "./components/Home";
 import PostDetails from "./components/PostDetails";
 import EditPost from "./components/EditPost";
+import ProfilePage from './components/ProfilePage';
 
 const App = () => {
 
@@ -23,6 +24,7 @@ const App = () => {
                 <Route path="Editor" element={<Editor />}/>
                 <Route path="/posts/:postId" element={<PostDetails />} />
                 <Route path="/posts/edit/:postId" element={<EditPost />}/>
+                <Route path="/profile" element={<ProfilePage />}/>
         
 
             </Routes>
