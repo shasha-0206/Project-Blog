@@ -15,6 +15,8 @@ const Navbar = () => {
         localStorage.removeItem('token');
         localStorage.setItem('isLoggedIn', 'false');
         setIsLoggedIn(false);
+
+        window.location.href = '/';
     };
 
     return (

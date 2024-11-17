@@ -189,9 +189,6 @@ app.get('/posts', async (req, res) => {
     }
 });
 
-
-
-
 // for showing post details when clicked 
 app.get('/posts/:postId', async (req, res) => {
     const { postId } = req.params;

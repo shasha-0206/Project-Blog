@@ -2,11 +2,18 @@ import React, { useState, useRef } from "react";
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin, FaUserEdit, FaKey } from "react-icons/fa";
 
 const ProfilePage = () => {
+  // State for storing the uploaded profile image
   const [profileImage, setProfileImage] = useState(null);
+
+  // Reference to the hidden file input element
   const fileInputRef = useRef(null);
+
+  // State for storing user details
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
+
+  // State for storing social media links
   const [socialLinks, setSocialLinks] = useState({
     facebook: "",
     instagram: "",
@@ -14,34 +21,37 @@ const ProfilePage = () => {
     linkedin: ""
   });
 
+  // Handles profile image upload and preview
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]; // Get the selected file
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader(); // Create a file reader
       reader.onloadend = () => {
-        setProfileImage(reader.result);
+        setProfileImage(reader.result); // Set the uploaded image as the profile image
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
 
+  // Simulates a click on the hidden file input when "Upload" button is clicked
   const handleUploadClick = () => {
-    fileInputRef.current.click(); // Trigger the file input click
+    fileInputRef.current.click();
   };
 
+  // Handles updates to social media links
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSocialLinks((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value // Dynamically updates the relevant field in socialLinks
     }));
   };
 
   return (
     <div style={styles.pageContainer}>
-        <span></span>
+      {/* Sidebar for navigation */}
       <div style={styles.sidebar}>
-      <div style={styles.sidebarItem}>
+        <div style={styles.sidebarItem}>
           <span><h2>Settings</h2></span>
         </div>
         <div style={styles.sidebarItem}>
@@ -53,26 +63,30 @@ const ProfilePage = () => {
           <span>Change Password</span>
         </div>
       </div>
+
+      {/* Main profile container */}
       <div style={styles.container}>
         <div style={styles.profileContainer}>
           <h2 style={styles.header}>Profile</h2>
+
+          {/* Profile image upload section */}
           <div style={styles.profileImageSection}>
             <label htmlFor="uploadImage" style={styles.imageLabel}>
               {profileImage ? (
                 <img
-                  src={profileImage}
+                  src={profileImage} // Display uploaded profile image
                   alt="Profile"
                   style={styles.profileImage}
                 />
               ) : (
-                <div style={styles.uploadPlaceholder}>Upload Image</div>
+                <div style={styles.uploadPlaceholder}>Upload Image</div> // Placeholder for profile image
               )}
             </label>
             <input
               type="file"
               id="uploadImage"
               style={styles.fileInput}
-              accept="image/*"
+              accept="image/*" // Accepts only image files
               onChange={handleImageChange}
               ref={fileInputRef}
             />
@@ -81,26 +95,41 @@ const ProfilePage = () => {
             Upload
           </button>
 
+          {/* User information form */}
           <div style={styles.formSection}>
             <div style={styles.inputGroup}>
               <label>Username</label>
-              <input type="text" value={username} readOnly style={styles.input} />
+              <input
+                type="text"
+                value={username}
+                style={styles.input}
+                onChange={(e) => setUsername(e.target.value)} // Update username state
+              />
             </div>
+
             <div style={styles.inputGroup}>
               <label>Email</label>
-              <input type="email" value={email} readOnly style={styles.input} />
+              <input
+                type="email"
+                value={email}
+                style={styles.input}
+                onChange={(e) => setEmail(e.target.value)} // Update email state
+              />
             </div>
+
             <div style={styles.inputGroup}>
               <label>Bio</label>
               <textarea
-                maxLength="200"
+                maxLength="200" // Limit bio to 200 characters
                 placeholder="Add a short bio"
                 value={bio}
-                onChange={(e) => setBio(e.target.value)}
+                onChange={(e) => setBio(e.target.value)} // Update bio state
                 style={styles.textarea}
               />
-              <p style={styles.charCounter}>{200 - bio.length} characters left</p>
+              <p style={styles.charCounter}>{200 - bio.length} characters left</p> {/* Display remaining character count */}
             </div>
+
+            {/* Social media links */}
             <h3 style={styles.subHeader}>Add Your Social Handles Below</h3>
             <div style={styles.socialInputs}>
               {[
@@ -115,8 +144,8 @@ const ProfilePage = () => {
                     type="text"
                     name={name}
                     placeholder={placeholder}
-                    value={socialLinks[name]}
-                    onChange={handleInputChange}
+                    value={socialLinks[name]} // Bind input value to socialLinks
+                    onChange={handleInputChange} // Handle changes dynamically
                     style={styles.socialInput}
                   />
                 </div>
@@ -124,6 +153,7 @@ const ProfilePage = () => {
             </div>
           </div>
 
+          {/* Update button */}
           <button style={styles.updateButton}>Update</button>
         </div>
       </div>
