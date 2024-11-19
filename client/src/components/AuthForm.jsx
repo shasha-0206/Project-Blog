@@ -1,52 +1,48 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { Toaster, toast } from "react-hot-toast";
 
 function AuthForm({ mode = 'login', onAuthSuccess }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
-    //on Submit
+    // onSubmit
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setSuccess('');
 
         const url = mode === 'signup' ? 'http://localhost:3000/signup' : 'http://localhost:3000/login';
-        
-            const response = await axios.post(url, { username, email, password });
 
+        try {
+            const response = await axios.post(url, { username, email, password });
             const json = response.data;
 
-            try{
+            if (json.success) {
+                localStorage.setItem('token', json.authtoken);
+                localStorage.setItem('isLoggedIn', 'true');
 
-                if(json.success){
-                    localStorage.setItem('token', json.authtoken); 
-                    
-                    // for rendering logout or profile
-                    localStorage.setItem('isLoggedIn', 'true');
-                    
-                    setSuccess(json.message);
-                    
-                    // using this mthod so that the home page is reloaded after successful login or signup
+                // Show success toast
+                toast.success(mode === 'signup' ? 'Signup successful!' : 'Login successful!');
+
+                // Redirect after 2 seconds
+                setTimeout(() => {
                     window.location.href = '/';
-                }
-                else{
-                    setError("Invalid credentials");
+                }, 2000);
+            }
+        } catch (err) {
+            if (err.response && err.response.data) {
+                // Extract error message and show error toast
+                toast.error(err.response.data.message || 'An error occurred.');
+            } else {
+                toast.error('Network error. Please try again later.');
             }
         }
-        catch(err){
-            setError(`Error: ${err}`)
-        }    
-       
     };
 
     return (
         <div className="row mt-3">
+            <Toaster />
             <h1 className="col-6 offset-3">
-                {/* switches on basis of mode */}
                 {mode === 'signup' ? 'Signup on BlogBliss' : 'Login'}
             </h1>
 
@@ -98,18 +94,15 @@ function AuthForm({ mode = 'login', onAuthSuccess }) {
                         />
                     </div>
 
-                    {/* Success Message */}
-                    {success && <p className="text-success">{success}</p>}
-
-                    {/* Error Message */}
-                    {error && <p className="text-danger">{error}</p>}
-
                     {/* Submit Button */}
                     <button type="submit" className="btn btn-success add-btn">
                         {mode === 'signup' ? 'Signup' : 'Login'}
                     </button>
                 </form>
             </div>
+
+            {/* Toast Container */}
+            {/* <ToastContainer position="top-right" autoClose={2000} hideProgressBar /> */}
         </div>
     );
 }

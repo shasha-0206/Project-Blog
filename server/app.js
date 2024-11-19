@@ -79,18 +79,20 @@ app.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) return res.status(400).json({ message: 'Invalid Password ' });
+
         const data = {
             user: {
                 id: user.id
             }
         }
+
         const authtoken = jwt.sign(data, JWT_SECRET);
         success = true;
         res.json({ success: success, authtoken: authtoken })
 
 
     } catch (error) {
-        res.status(500).json({ message: 'Login failed', error: error.message });
+        res.status(500).json({ success: false, message: 'Login failed', error: error.message });
     }
 });
 
