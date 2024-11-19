@@ -15,7 +15,6 @@ const Navbar = () => {
         localStorage.removeItem('token');
         localStorage.setItem('isLoggedIn', 'false');
         setIsLoggedIn(false);
-
         window.location.href = '/';
     };
 
@@ -46,11 +45,17 @@ const Navbar = () => {
 
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div className="navbar-nav">
+                            <Link className="nav-link nav-ele" to="/dashboard">
+                                Dashboard
+                            </Link>
                             <Link className="nav-link nav-ele" to="/">
-                                BlogBliss
+                                Explore
+                            </Link>
+                            <Link className="nav-link nav-ele" to="/MyPosts">
+                                My Posts
                             </Link>
                             <Link className="nav-link nav-ele" to="/Editor">
-                                New Post
+                               Create New Post 
                             </Link>
                         </div>
 
@@ -89,7 +94,6 @@ const Navbar = () => {
                                         fontSize: '18px',
                                     }}></i>
                                 </span>
-                            
                                 {/* Dropdown menu */}
                                 <ul className="dropdown-menu" aria-labelledby="userDropdown" style={{
                                     position: 'absolute',

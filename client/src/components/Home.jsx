@@ -15,6 +15,7 @@ const Home = () => {
 
   // for loading button
   const [loading, setLoading] = useState(false);
+  const [LoadMore, setLoadMore] = useState(false);
 
   // total posts count from backend
   const [totalPosts, setTotalPosts] = useState(0);
@@ -55,6 +56,7 @@ const Home = () => {
       }
       finally {
         setLoading(false);  // Set loading to false once the fetch is complete
+        setLoadMore(false)
       }
     };
 
@@ -68,6 +70,7 @@ const Home = () => {
 
   // Load more posts when the button is clicked
   const handleLoadMore = () => {
+    setLoadMore(true)
     setCurrentPage(prevPage => prevPage + 1); // Increment the page number
   };
 
@@ -107,7 +110,7 @@ const Home = () => {
 
       {/* load More button */}
       {
-        loading ?
+        LoadMore ?
           <div class="loader-container">
             <div class="loader"></div>
           </div>
