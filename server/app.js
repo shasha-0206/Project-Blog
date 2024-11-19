@@ -8,6 +8,8 @@ import cors from 'cors';
 import multer from 'multer';
 import fetchUser from './middleware/fetchUser.js';
 import dotenv from 'dotenv';
+import { body, validationResult } from 'express-validator';
+
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
@@ -28,8 +30,20 @@ mongoose.connect(DB_URL)
 
 
 // Signup Route
-app.post('/signup', async (req, res) => {
+app.post('/signup',[
+    body('username', 'Enter a valid name').isLength({ min: 3 }),
+    body('email', 'Enter a valid email').isEmail(),
+    body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
+  ], async (req, res) => {
+    let success = false;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success, message: 'Validation failed', errors: errors.array() });
+    
+    }
     const { username, email, password } = req.body;
+    
+
 
     try {
 
@@ -50,7 +64,9 @@ app.post('/signup', async (req, res) => {
             const data = { user: { id: user.id } };
             const authtoken = jwt.sign(data, JWT_SECRET);
             console.log("JWT_SECRET:", JWT_SECRET);
-            res.json({ authtoken });
+            success = true;
+            res.json({ success: success, authtoken: authtoken })
+
         } catch (error) {
             // console.log("JWT_SECRET:", JWT_SECRET); // This should print the secret key or the default value.
             console.error("Token generation error:", error);
@@ -65,7 +81,15 @@ app.post('/signup', async (req, res) => {
 
 
 // Login Route
-app.post('/login', async (req, res) => {
+app.post('/login',[
+    body('username', 'Enter a valid name').isLength({ min: 3 }),
+    
+  ], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { username, password } = req.body;
     let success = false;
 
@@ -79,20 +103,18 @@ app.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) return res.status(400).json({ message: 'Invalid Password ' });
-
         const data = {
             user: {
                 id: user.id
             }
         }
-
         const authtoken = jwt.sign(data, JWT_SECRET);
         success = true;
         res.json({ success: success, authtoken: authtoken })
 
 
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Login failed', error: error.message });
+        res.status(500).json({ message: 'Login failed', error: error.message });
     }
 });
 

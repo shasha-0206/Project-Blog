@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Toaster, toast } from "react-hot-toast";
 
 const Editor = () => {
   const [title, setTitle] = useState('');
@@ -28,18 +29,26 @@ const Editor = () => {
           'auth-token': localStorage.getItem('token')
         },
       });
-      setMessage(response.data.message);
-      navigate('/')
+      
+      // success toast
+      toast.success(response.data.message);
+
+      setTimeout(() =>{
+        navigate('/')
+
+      },1000)
 
     } catch (err) {
       console.error('Error creating post:', err.response || err); // Log any error from the backend
-      setMessage('Error creating post');
+      toast.error('Error creating post');
     }
   };
 
 
   return (
     <div className="col-8 offset-2 mt-3">
+      {/* used to render success and errors mssgs in frontend */}
+        <Toaster />
       <h3>Upload a New Post</h3>
       <form noValidate onSubmit={handleSubmit} className="needs-validation">
         <div className="mb-3">

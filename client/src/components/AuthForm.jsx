@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+// API to display toast notifications in your React app
 import { Toaster, toast } from "react-hot-toast";
 
 function AuthForm({ mode = 'login', onAuthSuccess }) {
@@ -41,6 +42,7 @@ function AuthForm({ mode = 'login', onAuthSuccess }) {
 
     return (
         <div className="row mt-3">
+            {/* used to render success and errors mssgs in frontend */}
             <Toaster />
             <h1 className="col-6 offset-3">
                 {mode === 'signup' ? 'Signup on BlogBliss' : 'Login'}
@@ -101,8 +103,6 @@ function AuthForm({ mode = 'login', onAuthSuccess }) {
                 </form>
             </div>
 
-            {/* Toast Container */}
-            {/* <ToastContainer position="top-right" autoClose={2000} hideProgressBar /> */}
         </div>
     );
 }
