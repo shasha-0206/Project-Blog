@@ -19,8 +19,8 @@ const PORT = process.env.PORT || 3000;
 
 
 // Middleware
-app.use(express.json());
-app.use(cors());
+app.use(express.json()); //it converts json data coming frontend into json objects
+app.use(cors()); //allows data tranfer between different ports since default allows all header and orgins and mathods(post get delete , etc)
 
 // MongoDB Connection
 const DB_URL = process.env.DB_URL;
@@ -36,14 +36,16 @@ app.post('/signup', [
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
 ], async (req, res) => {
     let success = false;
+    
+    // it is used to display errors whose validation was failed by body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.json({ success, message: 'Validation failed', errors: errors.array() });
 
     }
+
+    // access from body
     const { username, email, password } = req.body;
-
-
 
     try {
 
@@ -122,7 +124,6 @@ app.post('/login', [
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// image saving in mongo
 app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
 
     // getting title and content

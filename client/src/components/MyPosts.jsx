@@ -1,8 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Toaster, toast } from "react-hot-toast";
+import { useNavigate } from 'react-router-dom';
 
 const MyPosts = () => {
+
+  const navigate = useNavigate();
   // For storing posts fetched from the backend
   const [posts, setPosts] = useState([]);
 
@@ -11,6 +14,10 @@ const MyPosts = () => {
 
   // For loading state
   const [loading, setLoading] = useState(true);
+
+  const handlePostClick = (postId) => {
+    navigate(`/posts/${postId}`);  // Navigate to the post details page
+  };
 
   // Fetch posts created by the logged-in user
   const fetchPosts = async () => {
@@ -77,10 +84,12 @@ const MyPosts = () => {
                 className="card-img-top"
                 alt="post_image"
                 style={{ height: '20rem', cursor: 'pointer' }}
+                onClick={() => handlePostClick(post._id)}
               />
-              <div className="card-body">
+              <div className="card-body" style={{ cursor: 'pointer' }} onClick={() => handlePostClick(post._id)}>
                 <h5 className="card-title">{post.title}</h5>
                 <p className="card-text">{post.content.substring(0, 100)}...</p>
+                
               </div>
             </div>
           ))
