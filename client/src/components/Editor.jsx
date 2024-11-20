@@ -25,6 +25,8 @@ const Editor = () => {
     try {
       const response = await axios.post('http://localhost:3000/posts', formData, {
         headers: {
+          
+          // This content type is necessary when sending data that includes files, as it tells the server to handle the data as "multi-part" and properly encode it.
           'Content-Type': 'multipart/form-data',
           'auth-token': localStorage.getItem('token')
         },

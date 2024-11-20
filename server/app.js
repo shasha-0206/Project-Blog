@@ -30,19 +30,19 @@ mongoose.connect(DB_URL)
 
 
 // Signup Route
-app.post('/signup',[
+app.post('/signup', [
     body('username', 'Enter a valid name').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
-  ], async (req, res) => {
+], async (req, res) => {
     let success = false;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.json({ success, message: 'Validation failed', errors: errors.array() });
-    
+
     }
     const { username, email, password } = req.body;
-    
+
 
 
     try {
@@ -81,14 +81,14 @@ app.post('/signup',[
 
 
 // Login Route
-app.post('/login',[
+app.post('/login', [
     body('username', 'Enter a valid name').isLength({ min: 3 }),
-    
-  ], async (req, res) => {
+
+], async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     const { username, password } = req.body;
     let success = false;
@@ -181,19 +181,19 @@ app.get('/posts', async (req, res) => {
         const limit = 6;  // Number of posts per page
 
         // skiping prev pages
-        const skip = (section - 1) * limit;  
+        const skip = (section - 1) * limit;
 
         // fetching the number of total docs
         const totalPosts = await Post.countDocuments();
 
         // fetching data by skiping and limiting data
         const posts = await Post.find()
-        // for reversing 
-        .sort({ createdAt: -1 })
-        // for skiping already loaded data
-        .skip(skip)
-        // for limiting to load only 6 
-        .limit(limit);
+            // for reversing 
+            .sort({ createdAt: -1 })
+            // for skiping already loaded data
+            .skip(skip)
+            // for limiting to load only 6 
+            .limit(limit);
 
         const postsWithUsernames = [];
 
@@ -206,7 +206,7 @@ app.get('/posts', async (req, res) => {
             });
         }
 
-        res.status(200).json({ posts: postsWithUsernames, totalPosts: totalPosts});
+        res.status(200).json({ posts: postsWithUsernames, totalPosts: totalPosts });
     } catch (error) {
         console.error('Error fetching posts:', error);
         res.status(500).json({ message: 'Failed to load posts', error: error.message });
@@ -230,7 +230,7 @@ app.put('/posts/:postId', upload.single('image'), async (req, res) => {
     const { title, content } = req.body;
     const { postId } = req.params;
     let imageBase64 = null;
-    
+
     // If an image is uploaded, convert it to base64
     if (req.file) {
         console.log('Image uploaded:', req.file);
@@ -277,6 +277,26 @@ app.delete('/posts/:postId', async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// for rendering my posts in mypost page
+app.post('/myposts', fetchUser, async (req, res) => {
+    try {
+        const userId = req.user.id; // Authenticated user's ID from middleware
+
+        // Fetch all posts created by the authenticated user
+        const userPosts = await Post.find({ user: userId })
+            .sort({ createdAt: -1 });
+
+        if (!userPosts || userPosts.length === 0) {
+            return res.status(404).json({ message: 'No posts found for this user' });
+        }
+
+        res.status(200).json({ message: 'User posts fetched successfully', posts: userPosts });
+    } catch (error) {
+        console.error('Error fetching user posts:', error);
+        res.status(500).json({ message: 'Failed to fetch user posts', error: error.message });
     }
 });
 

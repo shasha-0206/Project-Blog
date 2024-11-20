@@ -3,7 +3,7 @@ import axios from 'axios';
 // API to display toast notifications in your React app
 import { Toaster, toast } from "react-hot-toast";
 
-function AuthForm({ mode = 'login', onAuthSuccess }) {
+function AuthForm({ mode = 'login'}) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Toaster, toast } from "react-hot-toast";
 
 const Home = () => {
 
   // for adding new posts to existing posts
   const [posts, setPosts] = useState([]);
-
-  // for error if any 
-  const [error, setError] = useState(null);
 
   // updating section after 6 posts have been loaded
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,7 +50,7 @@ const Home = () => {
 
       } catch (err) {
         console.error('Error fetching posts:', err);
-        setError('Failed to load posts');
+        toast.error('Failed to load posts');
       }
       finally {
         setLoading(false);  // Set loading to false once the fetch is complete
@@ -78,8 +76,8 @@ const Home = () => {
   const hasMorePosts = posts.length < totalPosts;
   return (
     <div className="container">
+      < Toaster />
       <h3>All Posts</h3>
-      {error && <p className="text-danger">{error}</p>}
 
       <div className="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
         {posts.length > 0 ? (
