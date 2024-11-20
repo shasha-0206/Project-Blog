@@ -28,7 +28,7 @@ function AuthForm({ mode = 'login', onAuthSuccess }) {
                 // Redirect after 2 seconds
                 setTimeout(() => {
                     window.location.href = '/';
-                }, 2000);
+                }, 500);
             }
         } catch (err) {
             if (err.response && err.response.data) {

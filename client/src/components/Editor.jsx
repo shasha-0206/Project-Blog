@@ -36,7 +36,7 @@ const Editor = () => {
       setTimeout(() =>{
         navigate('/')
 
-      },1000)
+      },500)
 
     } catch (err) {
       console.error('Error creating post:', err.response || err); // Log any error from the backend
