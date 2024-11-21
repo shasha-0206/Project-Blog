@@ -9,6 +9,7 @@ import PostDetails from "./components/PostDetails";
 import EditPost from "./components/EditPost";
 import ProfilePage from './components/ProfilePage';
 import ScrollToTop from "./components/ScrollTop";
+import AIEditor from "./components/AIEditor";
 
 const App = () => {
 
@@ -29,6 +30,7 @@ const App = () => {
                 <Route path="/posts/:postId" element={<PostDetails />} />
                 <Route path="/posts/edit/:postId" element={<EditPost />}/>
                 <Route path="/profile" element={<ProfilePage />}/>
+                <Route path="/generate-ai" element={<AIEditor/>}/>
         
 
             </Routes>

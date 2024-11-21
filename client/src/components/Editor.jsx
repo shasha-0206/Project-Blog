@@ -8,7 +8,7 @@ const Editor = () => {
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState('');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,32 +25,27 @@ const Editor = () => {
     try {
       const response = await axios.post('http://localhost:3000/posts', formData, {
         headers: {
-          
-          // This content type is necessary when sending data that includes files, as it tells the server to handle the data as "multi-part" and properly encode it.
           'Content-Type': 'multipart/form-data',
-          'auth-token': localStorage.getItem('token')
+          'auth-token': localStorage.getItem('token'),
         },
       });
-      
-      // success toast
+
+      // Success toast
       toast.success(response.data.message);
 
-      setTimeout(() =>{
-        navigate('/')
-
-      },500)
-
+      setTimeout(() => {
+        navigate('/');
+      }, 500);
     } catch (err) {
       console.error('Error creating post:', err.response || err); // Log any error from the backend
       toast.error('Error creating post');
     }
   };
 
-
   return (
     <div className="col-8 offset-2 mt-3">
-      {/* used to render success and errors mssgs in frontend */}
-        <Toaster />
+      {/* Used to render success and error messages in frontend */}
+      <Toaster />
       <h3>Upload a New Post</h3>
       <form noValidate onSubmit={handleSubmit} className="needs-validation">
         <div className="mb-3">
@@ -91,6 +86,16 @@ const Editor = () => {
 
         <button className="btn btn-dark add-btn" type="submit">Add</button>
       </form>
+
+      {/* Generate with AI Button */}
+      <div className="mt-4">
+        <button
+          className="btn btn-info"
+          onClick={() => navigate('/generate-ai')}
+        >
+          Generate with AI
+        </button>
+      </div>
 
       {message && <p>{message}</p>}
     </div>
