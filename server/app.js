@@ -225,13 +225,13 @@ app.get('/posts/:postId', async (req, res) => {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Construct the image URL if it exists
         const originalImageUrl = post.image
-            ? `data:image/jpeg;base64,${post.image}` // Assuming the image is stored as a base64 string
+            ? `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
             : null;
 
-        // Send both the post and the originalImageUrl
+        // sending both the post and the originalImageUrl
         res.json({ post, originalImageUrl });
+
     } catch (error) {
         console.error('Error fetching post:', error);
         res.status(500).json({ message: 'Failed to fetch post', error: error.message });
@@ -239,7 +239,7 @@ app.get('/posts/:postId', async (req, res) => {
 });
 
 
-// for edittinf post
+// for editting post
 app.put('/posts/:postId', upload.single('image'), async (req, res) => {
     const { title, content } = req.body;
     const { postId } = req.params;
