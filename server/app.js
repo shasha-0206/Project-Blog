@@ -218,13 +218,26 @@ app.get('/posts', async (req, res) => {
 app.get('/posts/:postId', async (req, res) => {
     const { postId } = req.params;
 
-    // Fetch the post from the database
-    const post = await Post.findById(postId);
-    if (!post) {
-        return res.status(404).json({ message: 'Post not found' });
+    try {
+        // Fetch the post from the database
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Construct the image URL if it exists
+        const originalImageUrl = post.image
+            ? `data:image/jpeg;base64,${post.image}` // Assuming the image is stored as a base64 string
+            : null;
+
+        // Send both the post and the originalImageUrl
+        res.json({ post, originalImageUrl });
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).json({ message: 'Failed to fetch post', error: error.message });
     }
-    res.json({ post });
 });
+
 
 // for edittinf post
 app.put('/posts/:postId', upload.single('image'), async (req, res) => {
