@@ -21,7 +21,6 @@ const App = () => {
             
             <Routes>
 
-                {/* Authentication Routes */}
                 <Route path="/" element={<Home  />} />
                 <Route path="signup" element={<AuthForm mode='signup' />} />
                 <Route path="signin" element={<AuthForm  />} />

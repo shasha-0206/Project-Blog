@@ -93,6 +93,7 @@ const Navbar = () => {
                                         color: 'white',
                                         fontSize: '18px',
                                     }}></i>
+                                    
                                 </span>
                                 {/* Dropdown menu */}
                                 <ul className="dropdown-menu" aria-labelledby="userDropdown" style={{

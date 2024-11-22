@@ -99,8 +99,8 @@ const Home = () => {
           ))
         ) : (
 
-          <div class="loader-container">
-            <div class="loader"></div>
+          <div className="loader-container">
+            <div className="loader"></div>
           </div>
 
         )}
@@ -109,8 +109,8 @@ const Home = () => {
       {/* load More button */}
       {
         LoadMore ?
-          <div class="loader-container">
-            <div class="loader"></div>
+          <div className="loader-container">
+            <div className="loader"></div>
           </div>
           :
           hasMorePosts && <button

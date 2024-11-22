@@ -3,10 +3,11 @@ import axios from 'axios';
 // API to display toast notifications in your React app
 import { Toaster, toast } from "react-hot-toast";
 
-function AuthForm({ mode = 'login'}) {
+function AuthForm({ mode = 'login' }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     // onSubmit
     const handleSubmit = async (e) => {
@@ -85,15 +86,24 @@ function AuthForm({ mode = 'login'}) {
                     {/* Password Field */}
                     <div className="mb-3">
                         <label htmlFor="password" className="form-label">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            className="form-control"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
+                        <div className="input-group">
+                            <input
+
+                            // for pass visibility
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                className="form-control"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+
+                            {/* eye icon */}
+                            <span className="input-group-text" onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
+                                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                            </span>
+                        </div>
                     </div>
 
                     {/* Submit Button */}
