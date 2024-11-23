@@ -312,6 +312,52 @@ app.post('/myposts', fetchUser, async (req, res) => {
     }
 });
 
+
+// Add a Comment to a Post
+app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
+    console.log(req.user.id);
+    const { postId } = req.params;
+    const { text } = req.body;
+    console.log(text);
+    if (!text) {
+        return res.status(400).json({ message: 'Comment text is required' });
+    }
+
+    try {
+        // Find the post by ID
+        const post = await Post.findById(postId);
+        
+        
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Find the authenticated user
+        const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(403).json({ message: 'User not authorized to comment' });
+        }
+
+        // Add the comment
+        post.comments.push({
+            username: user.username, // Use the authenticated user's username
+            text,
+        });
+          
+        await post.save();
+
+
+
+        res.status(201).json({ message: 'Comment added successfully', comments: post.comments });
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ message: 'Failed to add comment', error: error.message });
+    }
+});
+
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
