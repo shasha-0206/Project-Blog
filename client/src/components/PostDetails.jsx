@@ -59,7 +59,7 @@ const PostDetails = () => {
             />
             <div className="flex-grow-1">
               <h3>{post.title}</h3>
-              <p><strong>Author:</strong> {post.username ? post.username : 'Unknown'}</p>
+              <p><strong>Author:</strong> {post.user.username ? post.user.username : 'Unknown'}</p>
               <p><strong>Posted on:</strong> {new Date(post.createdAt).toLocaleString()}</p>
               <div className="d-flex mt-2">
                 <button

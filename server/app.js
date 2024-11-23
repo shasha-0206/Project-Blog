@@ -220,14 +220,12 @@ app.get('/posts/:postId', async (req, res) => {
 
     try {
         // Fetch the post from the database
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate('user', 'username');
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        const originalImageUrl = post.image
-            ? `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
-            : null;
+        const originalImageUrl = `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
 
         // sending both the post and the originalImageUrl
         res.json({ post, originalImageUrl });
