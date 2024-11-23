@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 import { toast, Toaster } from 'react-hot-toast';
 
 
@@ -79,6 +80,31 @@ const PostDetails = () => {
     }
   };
 
+  // deletion of comments
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('You must be logged in to delete a comment');
+        return;
+      }
+  
+      // Send a DELETE request to the backend to delete the comment
+      await axios.delete(`http://localhost:3000/posts/comments/${commentId}`, {
+        headers: { 'auth-token': token }
+      });
+  
+      // Remove the comment from the state
+      setComments((prevComments) => prevComments.filter(comment => comment._id !== commentId));
+  
+      toast.success('Comment deleted successfully');
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      toast.error('Failed to delete comment');
+    }
+  };
+  
   return (
     <div className="container mt-4">
       <Toaster />
@@ -142,30 +168,73 @@ const PostDetails = () => {
           {/* comments section */}
           <h4 className="mt-4">Comments</h4>
 
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment"
-            className="form-control mt-3"
-            rows="3"
-          ></textarea>
+          <div className="d-flex align-items-center">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              className="form-control me-2" // Adds margin to the right
+              rows="1" // Single line height
+              style={{ resize: 'none', width: '100%' }} // Removes resize handle, makes it fill the container
+            ></textarea>
 
-          <button
+            <button
+              onClick={() => handleAddComment(newComment)}
+              className="btn btn-primary d-flex align-items-center"
+              style={{ borderRadius: '10px', padding: '10px 20px' }} // Rounded corners
+            >
+              <i className="fas fa-paper-plane me-2"></i> Post
+            </button>
+          </div>
 
-            onClick={() => handleAddComment(newComment)}
-            className="btn btn-secondary mt-2">Add Comment
-          </button>
 
 
-          <ul className="mt-3">
-
+          <ul style={{ listStyleType: 'none', padding: 0 }}>
             {comments.map((comment, index) => (
-              <li key={index} style={{ marginBottom: '10px' }}>
-                <strong>{comment.username}:</strong> {comment.text}
+              <li
+                key={index}
+                style={{
+                  marginBottom: '20px',
+                  marginTop: '10px',
+                  padding: '15px',
+                  border: '1px solid #ddd',
+                  borderRadius: '10px',
+                  backgroundColor: '#f9f9f9',
+                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '16px' }}>{comment.username}</strong>
+                    <span style={{ fontSize: '12px', color: '#888' }}> {formatDistanceToNow(new Date(comment.createdAt), 'PPPpp')}</span>
+                  </div>
+
+                  {/* delete button */}
+                  <button
+                    onClick={() => handleDeleteComment(comment._id)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#e74c3c',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      marginLeft: 'auto'
+                    }}
+                  >
+                    <i className="fas fa-trash-alt"></i>
+                  </button>
+
+                </div>
+                <p style={{ fontSize: '14px', color: '#333', marginBottom: '10px' }}>{comment.text}</p>
+                <div style={{ display: 'flex', gap: '10px', fontSize: '14px', color: '#007bff', cursor: 'pointer' }}>
+                  <span>👍 </span>
+                  <span>👎 </span>
+                  <span>💬 Reply</span>
+                </div>
               </li>
             ))}
-
           </ul>
+
 
         </div>
       ) : (

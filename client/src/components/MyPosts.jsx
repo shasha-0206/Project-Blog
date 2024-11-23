@@ -9,9 +9,6 @@ const MyPosts = () => {
   // For storing posts fetched from the backend
   const [posts, setPosts] = useState([]);
 
-  // For error handling
-  const [error, setError] = useState(null);
-
   // For loading state
   const [loading, setLoading] = useState(true);
 
@@ -27,14 +24,12 @@ const MyPosts = () => {
       const token = localStorage.getItem('token');
       if (!token) {
         toast.error('No authentication token found');
-        setError('No authentication token found');
         setLoading(false);
         return;
       }
 
       // Make the API call to fetch posts
-      const response = await axios.post(
-        'http://localhost:3000/myposts', 
+      const response = await axios.post('http://localhost:3000/myposts', 
         {},
         {
           headers: {
@@ -47,9 +42,7 @@ const MyPosts = () => {
       setPosts(response.data.posts);
       setLoading(false); // Set loading to false once the data is fetched
     } catch (error) {
-      console.error('Error fetching posts:', error);
       toast.error('Failed to fetch posts');
-      setError('Failed to fetch posts');
       setLoading(false); // Set loading to false in case of error
     }
   };
@@ -65,11 +58,6 @@ const MyPosts = () => {
         <div className="loader"></div>
       </div>
     );
-  }
-
-  // If there's an error, show the error message
-  if (error) {
-    return <p className="text-danger">{error}</p>;
   }
 
   return (

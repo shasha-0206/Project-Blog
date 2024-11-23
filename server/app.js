@@ -357,6 +357,58 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
 });
 
 
+// Like a Post
+app.patch('/posts/:postId/like', fetchUser, async (req, res) => {
+    const { postId } = req.params;
+
+    try {
+        // Find the post by ID
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Find the authenticated user
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(403).json({ message: 'User not authorized to like the post' });
+        }
+
+        // Increment likes
+        post.likes = (post.likes || 0) + 1;
+
+        await post.save();
+
+        res.status(200).json({ message: 'Post liked successfully', likes: post.likes });
+    } catch (error) {
+        console.error('Error liking post:', error);
+        res.status(500).json({ message: 'Failed to like post', error: error.message });
+    }
+});
+
+
+// DELETE Comment Route
+app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
+  const { commentId } = req.params;
+  try {
+    // Find the post by its ID and remove the comment
+    const post = await Post.findOneAndUpdate(
+      { 'comments._id': commentId }, // Find post with the specific comment
+      { $pull: { comments: { _id: commentId } } }, // Remove the comment by its ID
+      { new: true } // Return the updated post
+    );
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post or comment not found' });
+    }
+
+    res.json({ message: 'Comment deleted successfully', post });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
