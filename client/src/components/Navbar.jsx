@@ -11,7 +11,7 @@ const Navbar = () => {
 
     const handleLogout = () => {
         // For logging out
-        
+
         localStorage.removeItem('token');
         localStorage.setItem('isLoggedIn', 'false');
         setIsLoggedIn(false);
@@ -51,11 +51,18 @@ const Navbar = () => {
                             <Link className="nav-link nav-ele" to="/">
                                 Explore
                             </Link>
-                            <Link className="nav-link nav-ele" to="/MyPosts">
-                                My Posts
-                            </Link>
+
+
+                            {/* only render my posts when user is logged in  */}
+                            {
+                                isLoggedIn ?
+                                    <Link className="nav-link nav-ele" to="/MyPosts">
+                                        My Posts
+                                    </Link> : ""
+                            }
+
                             <Link className="nav-link nav-ele" to="/Editor">
-                               Create New Post 
+                                Create New Post
                             </Link>
                         </div>
 
@@ -72,51 +79,51 @@ const Navbar = () => {
                                 </>
                             ) : (
                                 <div className="dropdown">
-                                <span
-                                    className="nav-link nav-ele"
-                                    style={{
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        backgroundColor: '#4d718e',
-                                    }}
-                                    id="userDropdown"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    <i className="fa-solid fa-user" style={{
-                                        color: 'white',
-                                        fontSize: '18px',
-                                    }}></i>
-                                    
-                                </span>
-                                {/* Dropdown menu */}
-                                <ul className="dropdown-menu" aria-labelledby="userDropdown" style={{
-                                    position: 'absolute',
-                                    top: '100%',
-                                    right: '0',
-                                    left: 'auto', // Ensure the dropdown aligns right
-                                    minWidth: '150px',
-                                    zIndex: 9999,  // Ensure the dropdown stays on top
-                                }}>
-                                    <li>
-                                        <Link className="dropdown-item" to="/profile">
-                                            Profile
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <span className="dropdown-item" style={{ cursor: 'pointer' }} onClick={handleLogout}>
-                                            Logout
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
-                            
+                                    <span
+                                        className="nav-link nav-ele"
+                                        style={{
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '50%',
+                                            overflow: 'hidden',
+                                            backgroundColor: '#4d718e',
+                                        }}
+                                        id="userDropdown"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <i className="fa-solid fa-user" style={{
+                                            color: 'white',
+                                            fontSize: '18px',
+                                        }}></i>
+
+                                    </span>
+                                    {/* Dropdown menu */}
+                                    <ul className="dropdown-menu" aria-labelledby="userDropdown" style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        right: '0',
+                                        left: 'auto', // Ensure the dropdown aligns right
+                                        minWidth: '150px',
+                                        zIndex: 9999,  // Ensure the dropdown stays on top
+                                    }}>
+                                        <li>
+                                            <Link className="dropdown-item" to="/profile">
+                                                Profile
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <span className="dropdown-item" style={{ cursor: 'pointer' }} onClick={handleLogout}>
+                                                Logout
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+
                             )}
                         </div>
                     </div>

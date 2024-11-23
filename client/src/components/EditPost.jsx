@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast , Toaster } from 'react-hot-toast';
 
 const EditPost = () => {
   const { postId } = useParams(); // Get postId from URL
@@ -12,27 +13,26 @@ const EditPost = () => {
   });
   const [selectedFile, setSelectedFile] = useState(null); // For new file upload
   const [imagePreview, setImagePreview] = useState(null); // For preview of new image
-  const [error, setError] = useState(''); // For handling errors
-  const [OriginalImageUrl,setOriginalImageUrl] = useState()
+  const [OriginalImageUrl, setOriginalImageUrl] = useState()
 
   // Fetch the post data when the component mounts
   useEffect(() => {
     const fetchPost = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/posts/${postId}`);
-            const postData = response.data.post;
-            const originalImageUrl = response.data.originalImageUrl;
+      try {
+        const response = await axios.get(`http://localhost:3000/posts/${postId}`);
+        const postData = response.data.post;
+        const originalImageUrl = response.data.originalImageUrl;
 
-            setPost(postData);
-            setOriginalImageUrl(originalImageUrl); // Set the originalImageUrl
-        } catch (err) {
-            console.error('Error fetching post details:', err);
-            setError('Failed to load post details');
-        }
+        setPost(postData);
+        setOriginalImageUrl(originalImageUrl); // Set the originalImageUrl
+      } catch (err) {
+        console.error('Error fetching post details:', err);
+        toast.error('Failed to load post details');
+      }
     };
 
     fetchPost();
-}, [postId]);
+  }, [postId]);
 
 
   // Handle form input changes
@@ -73,15 +73,20 @@ const EditPost = () => {
         },
       });
 
-      navigate('/'); // Redirect to the home page or posts list
+      toast.success("Post Updated successfully")
+      setTimeout(() => {
+        navigate('/MyPosts'); // Redirect to the home page or posts list
+      }, 2000)
+
     } catch (err) {
       console.error('Error updating post:', err);
-      setError('Failed to update post. Please try again.');
+      toast.error('Failed to update post. Please try again.');
     }
   };
 
   return (
     <div className="container mt-3">
+      <Toaster />
       <h3>Edit Post</h3>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <div className="mb-3">
@@ -120,38 +125,37 @@ const EditPost = () => {
             onChange={handleImageChange}
           />
           {
-            imagePreview ?  (
-            <div className="mt-2">
-              <strong>New Image Preview:</strong>
-              <br />
-              <img
-                src={imagePreview}
-                alt="New_Image_Preview"
-                style={{
-                  width: '13rem',
-                  height: '13rem',
-                  objectFit: 'cover',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                }}
-              />
-            </div>
-          ):
+            imagePreview ? (
+              <div className="mt-2">
+                <strong>New Image Preview:</strong>
+                <br />
+                <img
+                  src={imagePreview}
+                  alt="New_Image_Preview"
+                  style={{
+                    width: '13rem',
+                    height: '13rem',
+                    objectFit: 'cover',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                  }}
+                />
+              </div>
+            ) :
 
-          <div>
-          <strong>Original Post Image</strong>
-          <br />
-          <img
-            src={OriginalImageUrl}
-            alt="Original_Image"
-            style={{ width: '13rem', height: '13rem' }}
-          />
-        </div>
-        }
+              <div>
+                <strong>Original Post Image</strong>
+                <br />
+                <img
+                  src={OriginalImageUrl}
+                  alt="Original_Image"
+                  style={{ width: '13rem', height: '13rem' }}
+                />
+              </div>
+          }
         </div>
 
         <button type="submit" className="btn btn-dark edit-btn mt-3">Save Changes</button>
-        {error && <div className="alert alert-danger mt-3">{error}</div>}
       </form>
     </div>
   );

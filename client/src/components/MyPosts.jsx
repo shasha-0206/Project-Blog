@@ -16,7 +16,8 @@ const MyPosts = () => {
   const [loading, setLoading] = useState(true);
 
   const handlePostClick = (postId) => {
-    navigate(`/posts/${postId}`);  // Navigate to the post details page
+    navigate(`/posts/${postId}`, { state: { fromMyPosts: true } });  // adding state to differentiate between myposts and home page
+    // for rendering edit or delete 
   };
 
   // Fetch posts created by the logged-in user
