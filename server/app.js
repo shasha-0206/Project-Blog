@@ -36,7 +36,7 @@ app.post('/signup', [
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
 ], async (req, res) => {
     let success = false;
-    
+
     // it is used to display errors whose validation was failed by body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -228,7 +228,7 @@ app.get('/posts/:postId', async (req, res) => {
         const originalImageUrl = `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
 
         // sending both the post and the originalImageUrl
-        res.json({ post, originalImageUrl });
+        res.json({ post, likes: post.likes, originalImageUrl });
 
     } catch (error) {
         console.error('Error fetching post:', error);
@@ -326,15 +326,15 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
     try {
         // Find the post by ID
         const post = await Post.findById(postId);
-        
-        
+
+
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
         // Find the authenticated user
         const user = await User.findById(req.user.id);
-        
+
         if (!user) {
             return res.status(403).json({ message: 'User not authorized to comment' });
         }
@@ -344,7 +344,7 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
             username: user.username, // Use the authenticated user's username
             text,
         });
-          
+
         await post.save();
 
 
@@ -356,59 +356,64 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
     }
 });
 
-
-// Like a Post
-app.patch('/posts/:postId/like', fetchUser, async (req, res) => {
-    const { postId } = req.params;
-
+// DELETE Comment Route
+app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
+    const { commentId } = req.params;
     try {
-        // Find the post by ID
+        // Find the post by its ID and remove the comment
+        const post = await Post.findOneAndUpdate(
+            { 'comments._id': commentId }, // Find post with the specific comment
+            { $pull: { comments: { _id: commentId } } }, // Remove the comment by its ID
+            { new: true } // Return the updated post
+        );
+
+        if (!post) {
+            return res.status(404).json({ message: 'Post or comment not found' });
+        }
+
+        res.json({ message: 'Comment deleted successfully', post });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+app.post('/posts/like/:postId', fetchUser, async (req, res) => {
+
+    const { postId } = req.params;
+    const userId = req.user.id;
+    try {
+
         const post = await Post.findById(postId);
+
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Find the authenticated user
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(403).json({ message: 'User not authorized to like the post' });
+        post.likedBy = post.likedBy ? post.likedBy.filter(Boolean) : [];
+        // Check if the user has already liked the post
+        if (post.likedBy && post.likedBy.includes(userId)) {
+            // Unlike: Remove the user from likedBy array and decrement likes
+            post.likedBy = post.likedBy.filter((id) => id.toString() !== userId);
+
+            post.likes = Math.max(post.likes - 1, 0); // Prevent negative likes
+          
+        } else {
+            // Like: Add the user to likedBy array and increment likes
+            post.likedBy = post.likedBy || [];
+            post.likedBy.push(userId);
+            post.likes += 1;
         }
 
-        // Increment likes
-        post.likes = (post.likes || 0) + 1;
-
+        // Save the post
         await post.save();
 
-        res.status(200).json({ message: 'Post liked successfully', likes: post.likes });
+        res.status(200).json({ likes: post.likes, likedBy: post.likedBy });
     } catch (error) {
-        console.error('Error liking post:', error);
-        res.status(500).json({ message: 'Failed to like post', error: error.message });
+        console.error('Error updating likes:', error);
+        res.status(500).json({ message: 'Error updating likes', error: error.message });
     }
 });
-
-
-// DELETE Comment Route
-app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
-  const { commentId } = req.params;
-  try {
-    // Find the post by its ID and remove the comment
-    const post = await Post.findOneAndUpdate(
-      { 'comments._id': commentId }, // Find post with the specific comment
-      { $pull: { comments: { _id: commentId } } }, // Remove the comment by its ID
-      { new: true } // Return the updated post
-    );
-
-    if (!post) {
-      return res.status(404).json({ message: 'Post or comment not found' });
-    }
-
-    res.json({ message: 'Comment deleted successfully', post });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-
 
 // Start the server
 app.listen(PORT, () => {

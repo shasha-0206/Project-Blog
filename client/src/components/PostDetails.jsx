@@ -3,15 +3,18 @@ import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { toast, Toaster } from 'react-hot-toast';
+import { ThumbsUp } from 'lucide-react';
 
 
 const PostDetails = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [isLiked, setIsLiked] = useState();
+  const [likes, setLikes] = useState();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // checking where the page was loaded from or checking if state was passed to it
   const isFromMyPosts = location.state?.fromMyPosts;
@@ -23,6 +26,8 @@ const PostDetails = () => {
         // rendering the post using id
         const response = await axios.get(`http://localhost:3000/posts/${postId}`);
         setPost(response.data.post);
+        setLikes(response.data.post.likes)
+        setIsLiked(response.data.post.likedBy)
         setComments(response.data.post.comments || []);
       } catch (err) {
         toast.error('Failed to load post details');
@@ -84,27 +89,50 @@ const PostDetails = () => {
   const handleDeleteComment = async (commentId) => {
     try {
       const token = localStorage.getItem('token');
-      
+
       if (!token) {
         toast.error('You must be logged in to delete a comment');
         return;
       }
-  
+
       // Send a DELETE request to the backend to delete the comment
       await axios.delete(`http://localhost:3000/posts/comments/${commentId}`, {
         headers: { 'auth-token': token }
       });
-  
+
       // Remove the comment from the state
       setComments((prevComments) => prevComments.filter(comment => comment._id !== commentId));
-  
+
       toast.success('Comment deleted successfully');
     } catch (error) {
       console.error('Error deleting comment:', error);
       toast.error('Failed to delete comment');
     }
   };
-  
+
+
+  // likes
+  const handleLike = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('You must be logged in to like a post');
+      }
+
+      const response = await axios.post(`http://localhost:3000/posts/like/${postId}`,
+        {},
+        { headers: { 'auth-token': token } }
+      );
+
+      setLikes(response.data.likes); // Update likes count
+      setIsLiked(!isLiked); // Toggle like state
+    } catch (error) {
+      console.error('Error liking post:', error.response?.data?.message || error.message);
+      toast.error('Failed to like post');
+    }
+  };
+
+
   return (
     <div className="container mt-4">
       <Toaster />
@@ -154,15 +182,23 @@ const PostDetails = () => {
             {post.content}
           </p>
 
-          <p className="mt-4"><strong>Likes:</strong> 0</p>
+
+          {/* likes */}
+
           <button
-            // onClick={handleLike}
-            // disabled={liked}
-            className="btn btn-primary"
-            style={{ marginTop: '10px' }}
+            onClick={handleLike}
+            className="btn d-flex align-items-center gap-2 px-3 py-2 rounded-pill border transition"
+            aria-label={isLiked ? "Unlike" : "Like"}
+            style={{ backgroundColor: "white" }}
           >
-            {/* {liked ? 'Liked' : 'Like'} */}
-            like
+            <ThumbsUp
+              className={`transition ${isLiked ? "text-secondary" :'text-primary'}`}
+              size={20}
+            />
+
+            <span className={`fw-medium ${isLiked ? "text-secondary" : "text-primary"}`}>
+              {likes}
+            </span>
           </button>
 
           {/* comments section */}

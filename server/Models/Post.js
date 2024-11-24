@@ -5,7 +5,8 @@ const postSchema = new mongoose.Schema({
     image: { type: String },
     createdAt: { type: Date, default: Date.now },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    likes: { type: Number, default: 0 }, // Add likes field
+    likes: { type: Number, default: 0 },
+    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     comments: [
         {
             username: { type: String },
