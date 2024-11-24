@@ -16,21 +16,27 @@ function AuthForm({ mode = 'login' }) {
         const url = mode === 'signup' ? 'http://localhost:3000/signup' : 'http://localhost:3000/login';
 
         try {
+
+            // sending data to backend 
             const response = await axios.post(url, { username, email, password });
             const json = response.data;
-
+            
+            // success variable we sent from backend is being used here for authentication without any errors
             if (json.success) {
+
+                // saving token and loggedin inside localstorage
                 localStorage.setItem('token', json.authtoken);
                 localStorage.setItem('isLoggedIn', 'true');
 
                 // Show success toast
                 toast.success(mode === 'signup' ? 'Signup successful!' : 'Login successful!');
 
-                // Redirect after 2 seconds
+                // Redirect after .5 seconds
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 500);
             }
+            
         } catch (err) {
             if (err.response && err.response.data) {
                 // Extract error message and show error toast

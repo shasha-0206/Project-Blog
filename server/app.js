@@ -31,10 +31,13 @@ mongoose.connect(DB_URL)
 
 // Signup Route
 app.post('/signup', [
+
+    // for valditaion of user input
     body('username', 'Enter a valid name').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
-    body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
-], async (req, res) => {
+    body('password', 'Password must be atleast 5 characters').isLength({ min: 5 })], async (req, res) => {
+    
+    // for authentication 
     let success = false;
 
     // it is used to display errors whose validation was failed by body
@@ -51,6 +54,8 @@ app.post('/signup', [
 
         // checking if user already exist
         const existingUser = await User.findOne({ email });
+
+        // then we ask them to login
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
@@ -59,22 +64,21 @@ app.post('/signup', [
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ username, email, password: hashedPassword });
 
+        // saving into mongo
         await user.save();
 
         // authentication
         try {
             const data = { user: { id: user.id } };
             const authtoken = jwt.sign(data, JWT_SECRET);
-            console.log("JWT_SECRET:", JWT_SECRET);
             success = true;
             res.json({ success: success, authtoken: authtoken })
 
         } catch (error) {
-            // console.log("JWT_SECRET:", JWT_SECRET); // This should print the secret key or the default value.
-            console.error("Token generation error:", error);
             res.status(500).json({ message: 'Signup failed due to token generation', error: error.message });
 
         }
+
     } catch (error) {
         console.error("Signup error:", error);
         res.status(500).json({ message: JWT_SECRET, error: error.message });
@@ -92,6 +96,8 @@ app.post('/login', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
+
+    // getting from body
     const { username, password } = req.body;
     let success = false;
 
@@ -133,17 +139,19 @@ app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
     const imageFile = req.file;
     let success = false;
 
+    // without three user cant post 
     if (!title || !content || !imageFile) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
+    // converting image to string for saving into mongo
     let imageBase64 = null;
     if (imageFile) {
-        imageBase64 = imageFile.buffer.toString('base64');
-        // converting image to string for saving into mongo
+        imageBase64 = imageFile.buffer.toString('base64');  
     }
 
     const user = await User.findById(req.user.id);
+    
     if (!user) {
         return res.status(500).json({ message: 'Failed to create post', error: error.message });
     }
@@ -172,7 +180,7 @@ app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
 });
 
 
-// for getting post (Home page) from backend 
+// for getting post for home page from backend 
 app.get('/posts', async (req, res) => {
     try {
 
@@ -198,7 +206,7 @@ app.get('/posts', async (req, res) => {
 
         const postsWithUsernames = [];
 
-        // Use a for...of loop to iterate through posts and fetch usernames sequentially
+        // Use a for...of(values inside array) loop to iterate through posts and fetch usernames sequentially
         for (let post of posts) {
             const user = await User.findById(post.user); // Fetch the user by userId
             postsWithUsernames.push({
@@ -239,13 +247,19 @@ app.get('/posts/:postId', async (req, res) => {
 
 // for editting post
 app.put('/posts/:postId', upload.single('image'), async (req, res) => {
+
+    // from body
     const { title, content } = req.body;
+    
+    // from url
     const { postId } = req.params;
+
     let imageBase64 = null;
 
     // If an image is uploaded, convert it to base64
     if (req.file) {
-        console.log('Image uploaded:', req.file);
+        // buffers allow efficient handling of binary data directly in memory without converting it to other formats like strings or arrays
+        // we converting buffer to string 
         imageBase64 = req.file.buffer.toString('base64');
     }
 
@@ -255,24 +269,19 @@ app.put('/posts/:postId', upload.single('image'), async (req, res) => {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Log the incoming data
-        console.log('Received data:', { title, content, imageBase64 });
-
         post.title = title || post.title;
         post.content = content || post.content;
         post.image = imageBase64 || post.image;
 
         // Save the updated post
         await post.save();
-        console.log('Post updated:', post);
+
         res.status(200).json({ message: 'Post updated successfully', post });
+
     } catch (error) {
-        console.error('Error updating post:', error);
         res.status(500).json({ message: 'Failed to update post', error: error.message });
     }
 });
-
-
 
 // for deleting post
 app.delete('/posts/:postId', async (req, res) => {
@@ -299,6 +308,8 @@ app.post('/myposts', fetchUser, async (req, res) => {
 
         // Fetch all posts created by the authenticated user
         const userPosts = await Post.find({ user: userId })
+
+            // sortinf in desc to show latest post first
             .sort({ createdAt: -1 });
 
         if (!userPosts || userPosts.length === 0) {
@@ -315,10 +326,10 @@ app.post('/myposts', fetchUser, async (req, res) => {
 
 // Add a Comment to a Post
 app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
-    console.log(req.user.id);
+
     const { postId } = req.params;
     const { text } = req.body;
-    console.log(text);
+
     if (!text) {
         return res.status(400).json({ message: 'Comment text is required' });
     }
@@ -327,9 +338,8 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
         // Find the post by ID
         const post = await Post.findById(postId);
 
-
         if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
+            return res.status(404).json({ message: 'Post not found' })
         }
 
         // Find the authenticated user
@@ -339,15 +349,13 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
             return res.status(403).json({ message: 'User not authorized to comment' });
         }
 
-        // Add the comment
+        // Add the comment (since the Schema for comment is array)
         post.comments.push({
             username: user.username, // Use the authenticated user's username
             text,
         });
 
         await post.save();
-
-
 
         res.status(201).json({ message: 'Comment added successfully', comments: post.comments });
     } catch (error) {

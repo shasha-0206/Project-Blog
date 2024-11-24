@@ -9,8 +9,9 @@ const EditPost = () => {
   const [post, setPost] = useState({
     title: '',
     content: '',
-    image: '', // Initial values for state
+    image: '', // initial values for state since they load fast and if not initialsed will throw an error
   });
+  
   const [selectedFile, setSelectedFile] = useState(null); // For new file upload
   const [imagePreview, setImagePreview] = useState(null); // For preview of new image
   const [OriginalImageUrl, setOriginalImageUrl] = useState()

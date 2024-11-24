@@ -13,6 +13,7 @@ const Editor = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // using since we uploading form data is easier than manual 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('content', content);
@@ -20,11 +21,11 @@ const Editor = () => {
       formData.append('image', image);
     }
 
-    console.log('Form data being sent:', formData); // Check if the data is correctly formed
 
     try {
       const response = await axios.post('http://localhost:3000/posts', formData, {
         headers: {
+          // including both text data and binary data
           'Content-Type': 'multipart/form-data',
           'auth-token': localStorage.getItem('token'),
         },
@@ -33,6 +34,7 @@ const Editor = () => {
       // Success toast
       toast.success(response.data.message);
 
+      // .5 secs delaye
       setTimeout(() => {
         navigate('/');
       }, 500);
