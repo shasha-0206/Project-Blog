@@ -9,7 +9,7 @@ const Feedback = () => {
         e.preventDefault();
         
         try{
-            emailjs.sendForm('service_h78k659', 'template_eq2rcod', form.current, {publicKey: 'rxsDWPbdFZeeurgIU',})
+            emailjs.sendForm('', '', form.current, {publicKey: '',})
             toast.success('Email sent')
         }catch(err){
             toast.error('Cound not the send Email')
