@@ -116,6 +116,15 @@ const Navbar = () => {
                                                 Profile
                                             </Link>
                                         </li>
+
+                                        <li>
+                                            <Link className='dropdown-item ' to='/about' style={{ cursor: 'pointer' }}>About</Link>
+                                        </li>
+
+                                        <li>
+                                            <Link className='dropdown-item ' to='/feedback' style={{ cursor: 'pointer' }}>Feedback</Link>
+                                        </li>
+                                        
                                         <li>
                                             <span className="dropdown-item" style={{ cursor: 'pointer' }} onClick={handleLogout}>
                                                 Logout

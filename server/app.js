@@ -7,6 +7,7 @@ import Post from './Models/Post.js';
 import cors from 'cors';
 import multer from 'multer';
 import fetchUser from './middleware/fetchUser.js';
+import nodemailer from 'nodemailer'
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
@@ -400,6 +401,8 @@ app.post('/posts/like/:postId', fetchUser, async (req, res) => {
 
         post.likedBy = post.likedBy ? post.likedBy.filter(Boolean) : [];
         // Check if the user has already liked the post
+        // since likedby is array we can use includes to check if the user is already added in array or not
+
         if (post.likedBy && post.likedBy.includes(userId)) {
             // Unlike: Remove the user from likedBy array and decrement likes
             post.likedBy = post.likedBy.filter((id) => id.toString() !== userId);
