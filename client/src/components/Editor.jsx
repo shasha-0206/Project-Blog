@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from "react-hot-toast";
@@ -10,12 +9,10 @@ const Editor = () => {
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // using since we uploading form data is easier than manual 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('content', content);
@@ -23,25 +20,21 @@ const Editor = () => {
       formData.append('image', image);
     }
 
-
     try {
       const response = await axios.post('http://localhost:3000/posts', formData, {
         headers: {
-          // including both text data and binary data
           'Content-Type': 'multipart/form-data',
           'auth-token': localStorage.getItem('token'),
         },
       });
 
-      // Success toast
       toast.success(response.data.message);
 
-      // .5 secs delaye
       setTimeout(() => {
         navigate('/');
       }, 500);
     } catch (err) {
-      console.error('Error creating post:', err.response || err); // Log any error from the backend
+      console.error('Error creating post:', err.response || err);
       toast.error('Error creating post');
     }
   };
@@ -49,16 +42,25 @@ const Editor = () => {
   useEffect(() => {
     let isLoggedIn = localStorage.getItem('isLoggedIn') === "true";
     if (!isLoggedIn) {
-        localStorage.setItem('addpostsrm', 'You must be logged in to post.');
-        navigate('/signin');
+      localStorage.setItem('addpostsrm', 'You must be logged in to post.');
+      navigate('/signin');
     }
-}, []); 
+  }, []); 
+
   return (
     <div className="col-8 offset-2 mt-3 mb-3">
-      {/* Used to render success and error messages in frontend */}
       <Toaster />
-      <h3>Upload a New Post</h3>
-      <form onSubmit={handleSubmit} novalidate className="needs-validation" enctype="multipart/form-data">
+      <div className="d-flex justify-content-between align-items-center">
+        <h3>Upload a New Post</h3>
+        <button
+          className="btn btn-info submit-btn"
+          onClick={() => navigate('/generate-ai')}
+        >
+          Generate with AI
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} noValidate className="needs-validation" encType="multipart/form-data">
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
           <input
@@ -82,7 +84,7 @@ const Editor = () => {
             onChange={(e) => setContent(e.target.value)}
             required
           ></textarea>
-          <div class="invalid-feedback">Please input some content to post</div>
+          <div className="invalid-feedback">Please input some content to post</div>
         </div>
 
         <div className="mb-3">
@@ -98,16 +100,6 @@ const Editor = () => {
 
         <button className="btn btn-dark add-btn" type="submit">Add</button>
       </form>
-
-      {/* Generate with AI Button */}
-      <div className="mt-4">
-        <button
-          className="btn btn-info submit-btn"
-          onClick={() => navigate('/generate-ai')}
-        >
-          Generate with AI
-        </button>
-      </div>
 
       {message && <p>{message}</p>}
     </div>
