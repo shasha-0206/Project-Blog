@@ -7,7 +7,6 @@ import Post from './Models/Post.js';
 import cors from 'cors';
 import multer from 'multer';
 import fetchUser from './middleware/fetchUser.js';
-import nodemailer from 'nodemailer'
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
@@ -37,54 +36,54 @@ app.post('/signup', [
     body('username', 'Enter a valid name').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 })], async (req, res) => {
-    
-    // for authentication 
-    let success = false;
 
-    // it is used to display errors whose validation was failed by body
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.json({ success, message: 'Validation failed', errors: errors.array() });
+        // for authentication 
+        let success = false;
 
-    }
+        // it is used to display errors whose validation was failed by body
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.json({ success, message: 'Validation failed', errors: errors.array() });
 
-    // access from body
-    const { username, email, password } = req.body;
-
-    try {
-
-        // checking if user already exist
-        const existingUser = await User.findOne({ email });
-
-        // then we ask them to login
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
         }
 
-        // hashing pass if user is new
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, password: hashedPassword });
+        // access from body
+        const { username, email, password } = req.body;
 
-        // saving into mongo
-        await user.save();
-
-        // authentication
         try {
-            const data = { user: { id: user.id } };
-            const authtoken = jwt.sign(data, JWT_SECRET);
-            success = true;
-            res.json({ success: success, authtoken: authtoken })
+
+            // checking if user already exist
+            const existingUser = await User.findOne({ email });
+
+            // then we ask them to login
+            if (existingUser) {
+                return res.status(400).json({ message: 'User already exists' });
+            }
+
+            // hashing pass if user is new
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const user = new User({ username, email, password: hashedPassword });
+
+            // saving into mongo
+            await user.save();
+
+            // authentication
+            try {
+                const data = { user: { id: user.id } };
+                const authtoken = jwt.sign(data, JWT_SECRET);
+                success = true;
+                res.json({ success: success, authtoken: authtoken })
+
+            } catch (error) {
+                res.status(500).json({ message: 'Signup failed due to token generation', error: error.message });
+
+            }
 
         } catch (error) {
-            res.status(500).json({ message: 'Signup failed due to token generation', error: error.message });
-
+            console.error("Signup error:", error);
+            res.status(500).json({ message: JWT_SECRET, error: error.message });
         }
-
-    } catch (error) {
-        console.error("Signup error:", error);
-        res.status(500).json({ message: JWT_SECRET, error: error.message });
-    }
-});
+    });
 
 
 // Login Route
@@ -148,11 +147,11 @@ app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
     // converting image to string for saving into mongo
     let imageBase64 = null;
     if (imageFile) {
-        imageBase64 = imageFile.buffer.toString('base64');  
+        imageBase64 = imageFile.buffer.toString('base64');
     }
 
     const user = await User.findById(req.user.id);
-    
+
     if (!user) {
         return res.status(500).json({ message: 'Failed to create post', error: error.message });
     }
@@ -237,7 +236,7 @@ app.get('/posts/:postId', async (req, res) => {
         const originalImageUrl = `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
 
         // sending both the post and the originalImageUrl
-        res.json({ post, likes: post.likes, originalImageUrl });
+        res.json({ post, likes: post.likes, originalImageUrl, isLiked: post.isLiked });
 
     } catch (error) {
         console.error('Error fetching post:', error);
@@ -251,7 +250,7 @@ app.put('/posts/:postId', upload.single('image'), async (req, res) => {
 
     // from body
     const { title, content } = req.body;
-    
+
     // from url
     const { postId } = req.params;
 
@@ -354,6 +353,7 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
         post.comments.push({
             username: user.username, // Use the authenticated user's username
             text,
+            createdAt: new Date()
         });
 
         await post.save();
@@ -372,7 +372,7 @@ app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
         // Find the post by its ID and remove the comment
         const post = await Post.findOneAndUpdate(
             { 'comments._id': commentId }, // Find post with the specific comment
-            { $pull: { comments: { _id: commentId } } }, // Remove the comment by its ID
+            { $pull: { comments: { _id: commentId } } }, // since comments are array we use pull to remove elements from it
             { new: true } // Return the updated post
         );
 
@@ -408,7 +408,7 @@ app.post('/posts/like/:postId', fetchUser, async (req, res) => {
             post.likedBy = post.likedBy.filter((id) => id.toString() !== userId);
 
             post.likes = Math.max(post.likes - 1, 0); // Prevent negative likes
-          
+
         } else {
             // Like: Add the user to likedBy array and increment likes
             post.likedBy = post.likedBy || [];
@@ -423,6 +423,160 @@ app.post('/posts/like/:postId', fetchUser, async (req, res) => {
     } catch (error) {
         console.error('Error updating likes:', error);
         res.status(500).json({ message: 'Error updating likes', error: error.message });
+    }
+});
+
+
+// profile
+const storage2 = multer.memoryStorage();
+const upload2 = multer({ storage: storage2 });
+
+app.post('/profile', fetchUser, upload2.single('profilePic'), async (req, res) => {
+    try {
+        // Fetch the user from the database
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Get the image file from the request
+        const imageFile = req.file;
+        if (!imageFile) {
+            return res.status(400).json({ message: "Profile picture is required" });
+        }
+
+        // Convert the image to Base64
+        const imageBase64 = imageFile.buffer.toString('base64');
+
+        // Update the user's profile picture
+        user.profileImage = imageBase64; // Assume `profileImage` is a string field in the User model
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Profile picture updated successfully",
+            profileImage: user.profileImage,
+        });
+
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        res.status(500).json({ success: false, message: "Error uploading profile picture", error: error.message });
+    }
+});
+
+app.get('/profile', fetchUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Update user profile
+app.put('/profile', fetchUser, upload.single('profilePic'), async (req, res) => {
+    try {
+        const { username, bio, socialLinks } = req.body;
+
+        // Update profile image if exists
+        let profileImage = req.body.profileImage;
+        if (req.file) {
+            profileImage = req.file.buffer.toString('base64'); // Convert to Base64
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            { username, bio, socialLinks, profileImage },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        res.json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+// Route to get the total number of comments for all posts by the logged-in user
+app.get('/api/user/comments', fetchUser, async (req, res) => {
+    try {
+        // Get the user ID from the verified token
+        const userId = req.user.id; //  the fetchUser middleware adds the user to the request object
+        console.log(userId);
+
+        // Get all posts by the logged-in user
+        const posts = await Post.find({ user: userId }); // Ensure to use 'user' field in Post schema for the reference
+
+        // Calculate the total number of comments for all posts by the user
+        let totalComments = 0;
+        posts.forEach(post => {
+            totalComments += post.comments.length; // Count the number of comments in each post
+        });
+        console.log(totalComments);
+
+        res.status(200).json({ totalComments });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+// Route to count total number of posts done by user
+
+app.get('/api/user/posts', fetchUser, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        console.log(userId);
+
+        const posts = await Post.find({ user: userId });
+        let totalPosts = posts.length;
+        console.log('total posts', totalPosts);
+
+        res.json({ totalPosts });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+
+
+
+    }
+
+})
+
+// Route to get recent 5 comments across all posts
+app.get('/api/user/recent-comments', fetchUser, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        console.log(userId);
+
+
+        // Find all posts of the logged-in user and retrieve the title and comments
+        const posts = await Post.find({ user: userId }).select('title comments'); // Filter by the logged-in user's ID
+
+        // Flatten all comments from all posts into a single array and include the post title
+        const allComments = posts.flatMap(post =>
+            post.comments.map(comment => ({
+                postTitle: post.title,  // Include the post title with each comment
+                username: comment.username,
+                text: comment.text,
+                createdAt: comment.createdAt
+            }))
+        );
+
+        // Sort the comments by createdAt in descending order (latest first)
+        const sortedComments = allComments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Get the first 5 comments (most recent)
+        const recentComments = sortedComments.slice(0, 5);
+
+        // Send the response with the most recent comments
+        res.json(recentComments);
+    } catch (error) {
+        console.error('Error fetching recent comments:', error);
+        res.status(500).json({ message: 'Failed to load recent comments' });
     }
 });
 

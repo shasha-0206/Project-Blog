@@ -7,7 +7,6 @@ const Editor = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -60,7 +59,7 @@ const Editor = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-          />
+          />  
         </div>
 
         <div className="mb-3">
@@ -99,7 +98,6 @@ const Editor = () => {
         </button>
       </div>
 
-      {message && <p>{message}</p>}
     </div>
   );
 };

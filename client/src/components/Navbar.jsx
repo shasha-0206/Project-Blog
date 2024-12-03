@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [profilepic,setProfilepic] = useState()
 
     useEffect(() => {
         const loggedInStatus = localStorage.getItem('isLoggedIn') === 'true';
@@ -16,7 +17,26 @@ const Navbar = () => {
         localStorage.setItem('isLoggedIn', 'false');
         setIsLoggedIn(false);
         window.location.href = '/';
+        
     };
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://localhost:3000/profile", {
+                    headers: { "auth-token": token },
+                });
+
+                setProfilepic(response.data.profileImage)
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [])
 
     return (
         <>
@@ -96,12 +116,18 @@ const Navbar = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                     >
-                                        <i className="fa-solid fa-user" style={{
-                                            color: 'white',
-                                            fontSize: '18px',
-                                        }}></i>
+                                        {
+                                            profilepic?
+                                            <img src={profilepic}/>
+                                            :
+                                            <i className="fa-solid fa-user" style={{
+                                                color: 'white',
+                                                fontSize: '18px',
+                                            }}></i>
+                                        }
 
                                     </span>
+
                                     {/* Dropdown menu */}
                                     <ul className="dropdown-menu" aria-labelledby="userDropdown" style={{
                                         position: 'absolute',
@@ -124,7 +150,7 @@ const Navbar = () => {
                                         <li>
                                             <Link className='dropdown-item ' to='/feedback' style={{ cursor: 'pointer' }}>Feedback</Link>
                                         </li>
-                                        
+
                                         <li>
                                             <span className="dropdown-item" style={{ cursor: 'pointer' }} onClick={handleLogout}>
                                                 Logout

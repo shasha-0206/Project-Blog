@@ -58,18 +58,21 @@ const PostDetails = () => {
   // comments
   const handleAddComment = async (commentText) => {
 
+    
     try {
       const token = localStorage.getItem('token');
-
+      
       if (!token) {
         toast.error('You must be logged in to add a comment');
         return;
       }
-
+      
       const response = await axios.post(`http://localhost:3000/posts/comments/${postId}`,
         { text: commentText },
         { headers: { 'auth-token': token } }
-      );;
+      );
+
+      window.location.reload();
 
       // loads the prev comments again when the button is clicked due to which new comments appear immediately
       setComments((prevComments) => [
@@ -143,7 +146,7 @@ const PostDetails = () => {
               src={`data:image/jpeg;base64,${post.image}`}
               alt="Post"
               style={{
-                width: '600px',  // Slightly larger width
+                width: '600px',  
                 height: 'auto',
                 borderRadius: '8px',
                 marginRight: '20px'
@@ -152,7 +155,7 @@ const PostDetails = () => {
             <div className="flex-grow-1">
               <h3>{post.title}</h3>
               <p><strong>Author:</strong> {post.user.username ? post.user.username : 'Unknown'}</p>
-              <p><strong>Posted on:</strong> {new Date(post.createdAt).toLocaleString()}</p>
+              <p><strong>Posted on:</strong> {post.createdAt ? new Date(post.createdAt).toLocaleString() : "less than a minute"}</p>
 
               {
                 isFromMyPosts ?
@@ -226,7 +229,9 @@ const PostDetails = () => {
 
 
           <ul style={{ listStyleType: 'none', padding: 0 }}>
-            {comments.map((comment, index) => (
+            {comments.slice().reverse().map((comment, index) => (
+              // made a copy of comments to display them in reverse in order casue react changes on basis of reference
+              
               <li
                 key={index}
                 style={{
@@ -242,7 +247,8 @@ const PostDetails = () => {
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                   <div>
                     <strong style={{ display: 'block', fontSize: '16px' }}>{comment.username}</strong>
-                    <span style={{ fontSize: '12px', color: '#888' }}> {formatDistanceToNow(new Date(comment.createdAt), 'PPPpp')}</span>
+                    <span style={{ fontSize: '12px', color: '#888' }}> {comment.createdAt ? formatDistanceToNow(new Date(comment.createdAt)):'unknown'}</span>
+                    
                   </div>
 
                   {/* delete button */}
@@ -262,11 +268,7 @@ const PostDetails = () => {
 
                 </div>
                 <p style={{ fontSize: '14px', color: '#333', marginBottom: '10px' }}>{comment.text}</p>
-                <div style={{ display: 'flex', gap: '10px', fontSize: '14px', color: '#007bff', cursor: 'pointer' }}>
-                  <span>👍 </span>
-                  <span>👎 </span>
-                  <span>💬 Reply</span>
-                </div>
+             
               </li>
             ))}
           </ul>
@@ -274,8 +276,8 @@ const PostDetails = () => {
 
         </div>
       ) : (
-        <div class="loader-container">
-          <div class="loader"></div>
+        <div className="loader-container">
+          <div className="loader"></div>
         </div>
       )}
     </div>

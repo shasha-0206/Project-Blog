@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Hugging Face API Key and URL
-HUGGING_FACE_API_KEY = ""
+HUGGING_FACE_API_KEY = "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"
 API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct"
 
 # Function to get model response
