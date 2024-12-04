@@ -233,8 +233,6 @@ app.get('/posts/:postId', async (req, res) => {
         }
 
         let originalImageUrl=post.image.url;
-        originalImageUrl=originalImageUrl.replace("/upload","/upload/w_250");
-
         // sending both the post and the originalImageUrl
         res.json({ post, likes: post.likes, originalImageUrl, isLiked: post.isLiked });
 
