@@ -381,7 +381,7 @@ app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
 
         // Check if the user is the post owner or the comment author
         if (post.user.toString() !== userId && comment.username !== user.username) {
-            return res.status(403).json({ message: 'Unauthorized to delete this comment' });
+            return res.status(403).json({ message: 'You are not author of this comment!' });
         }
 
         // Remove the comment
