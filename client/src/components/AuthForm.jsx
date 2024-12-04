@@ -106,7 +106,6 @@ function AuthForm({ mode = 'login' }) {
                             </span>
                         </div>
                     </div>
-
                     <button type="submit" className="btn btn-success add-btn mb-5">
                         {mode === 'signup' ? 'Signup' : 'Login'}
                     </button>

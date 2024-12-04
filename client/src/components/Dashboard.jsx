@@ -58,6 +58,7 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <Toaster position="top-right" />
+
       {/* Sidebar */}
       <aside id="sidebar" className={openSidebarToggle ? 'sidebar-responsive' : ''}>
         <ul className="sidebar-list">

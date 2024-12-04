@@ -92,7 +92,7 @@ const Home = () => {
               />
               <div className="card-body" style={{ cursor: 'pointer' }} onClick={() => handlePostClick(post._id)}>
                 <p className="card-text"><b>{post.title}</b><br /> by {post.username}</p>
-                
+
               </div>
             </div>
           ))

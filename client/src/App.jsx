@@ -14,7 +14,6 @@ import About from "./components/About";
 import Feedback from "./components/Feedback";
 import Dashboard from "./components/Dashboard";
 
-
 const App = () => {
     return (
         <Router>

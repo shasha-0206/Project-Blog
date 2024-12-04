@@ -176,18 +176,13 @@ const PostDetails = () => {
                   </div> : ""
 
               }
-
               </div>
-              
-
             </div>
 
           
           <div className="mt-3 post-content">
             <p>{post.content}</p>
           </div>
-
-
           {/* likes */}
 
           <button

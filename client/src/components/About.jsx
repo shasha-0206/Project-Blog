@@ -27,7 +27,6 @@ const About = () => {
     
     
     </div>
-       
     );
 };
 

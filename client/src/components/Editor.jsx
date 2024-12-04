@@ -53,7 +53,6 @@ const Editor = () => {
         navigate('/signin');
     }
 }, []); 
-
   return (
     <div className="col-8 offset-2 mt-3 mb-3">
       {/* Used to render success and error messages in frontend */}
@@ -84,7 +83,6 @@ const Editor = () => {
             required
           ></textarea>
           <div class="invalid-feedback">Please input some content to post</div>
-
         </div>
 
         <div className="mb-3">

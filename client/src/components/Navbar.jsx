@@ -67,8 +67,7 @@ const Navbar = () => {
                             About Us
                         </Link>
               
-                        <Link className="nav-link nav-ele m-auto" to="/feedback">
-                            Feedback
+                        <Link className="nav-link nav-ele m-auto" to="/feedback">Feedback
                         </Link> 
                         {!isLoggedIn ? (
                             <>

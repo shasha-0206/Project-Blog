@@ -279,7 +279,6 @@ const AIEditor = () => {
           </button>
         </div>
       </div>
-
   );
 };
 

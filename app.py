@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
 import requests
 
 from dotenv import load_dotenv
@@ -21,6 +22,7 @@ api_url =os.getenv('API_URL')
 def getModelResponse(input_text_field, no_words, blog_style):
     headers = {
         "Authorization": f"Bearer {hugging_face_api_key}"
+
     }
     # Adjusted prompt to encourage more detailed responses and formatting
     prompt = f"""
