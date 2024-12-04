@@ -33,7 +33,7 @@ mongoose.connect(DB_URL)
 app.post('/signup', [
 
     // for valditaion of user input
-    body('username', 'Enter a valid name').isLength({ min: 3 }),
+    body('username', 'Username must be atleast 3 characters').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 })], async (req, res) => {
 
@@ -222,27 +222,7 @@ app.get('/posts', async (req, res) => {
     }
 });
 
-// for showing post details when clicked 
-app.get('/posts/:postId', async (req, res) => {
-    const { postId } = req.params;
 
-    try {
-        // Fetch the post from the database
-        const post = await Post.findById(postId).populate('user', 'username');
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-
-        const originalImageUrl = `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
-
-        // sending both the post and the originalImageUrl
-        res.json({ post, likes: post.likes, originalImageUrl, isLiked: post.isLiked });
-
-    } catch (error) {
-        console.error('Error fetching post:', error);
-        res.status(500).json({ message: 'Failed to fetch post', error: error.message });
-    }
-});
 
 
 // for editting post
@@ -366,19 +346,38 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
 });
 
 // DELETE Comment Route
+
 app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
     const { commentId } = req.params;
+    const userId = req.user.id; // Assume `fetchUser` sets `req.user.id`
+
     try {
-        // Find the post by its ID and remove the comment
-        const post = await Post.findOneAndUpdate(
-            { 'comments._id': commentId }, // Find post with the specific comment
-            { $pull: { comments: { _id: commentId } } }, // since comments are array we use pull to remove elements from it
-            { new: true } // Return the updated post
-        );
+        // Find the post containing the comment
+        const post = await Post.findOne({ 'comments._id': commentId });
+        const user = await User.findById(userId);
+
 
         if (!post) {
             return res.status(404).json({ message: 'Post or comment not found' });
         }
+
+        // Find the comment within the post
+        const comment = post.comments.id(commentId);
+
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // Check if the user is the post owner or the comment author
+        if (post.user.toString() !== userId && comment.username !== user.username) {
+            return res.status(403).json({ message: 'Unauthorized to delete this comment' });
+        }
+
+        // Remove the comment
+        post.comments.pull(commentId);
+
+        // Save the updated post
+        await post.save();
 
         res.json({ message: 'Comment deleted successfully', post });
     } catch (err) {
@@ -387,44 +386,68 @@ app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
     }
 });
 
-app.post('/posts/like/:postId', fetchUser, async (req, res) => {
-
+// for showing post details when clicked 
+app.get('/posts/:postId', async (req, res) => {
     const { postId } = req.params;
-    const userId = req.user.id;
-    try {
 
+    try {
+        // Fetch the post from the database
+        const post = await Post.findById(postId).populate('user', 'username');
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        const originalImageUrl = `data:image/jpeg;base64,${post.image}`; // Assuming the image is stored as a base64 string
+
+        // Send both post details and originalImageUrl
+        res.json({ post, likes: post.likes, originalImageUrl  });
+    } catch (error) {
+        console.error('Error fetching post:', error);
+        res.status(500).json({ message: 'Failed to fetch post', error: error.message });
+    }
+});
+
+
+// Route to like/unlike a post
+app.post('/posts/like/:postId', fetchUser, async (req, res) => {
+    const { postId } = req.params;
+    const userId = req.user.id; // Logged-in user's ID
+    let isLiked = true; // Default value for like status
+
+    try {
         const post = await Post.findById(postId);
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        post.likedBy = post.likedBy ? post.likedBy.filter(Boolean) : [];
         // Check if the user has already liked the post
-        // since likedby is array we can use includes to check if the user is already added in array or not
-
-        if (post.likedBy && post.likedBy.includes(userId)) {
-            // Unlike: Remove the user from likedBy array and decrement likes
-            post.likedBy = post.likedBy.filter((id) => id.toString() !== userId);
-
-            post.likes = Math.max(post.likes - 1, 0); // Prevent negative likes
-
+        if (post.likedBy.includes(userId)) {
+            post.likes = Math.max(0, post.likes - 1); // Decrement likes if already liked
+            post.likedBy = post.likedBy.filter(id => id !== userId); // Remove userId from likedBy array
+            isLiked = false; // Set isLiked to false (since user is unliking the post)
         } else {
-            // Like: Add the user to likedBy array and increment likes
-            post.likedBy = post.likedBy || [];
+            // Add userId to likedBy array and increment likes count
             post.likedBy.push(userId);
             post.likes += 1;
+            console.log('Before update:', post.likedBy);
+            console.log('Like response:', { likes: post.likes, isliked: isLiked });
+
+
         }
 
-        // Save the post
+        // Save the updated post
         await post.save();
 
-        res.status(200).json({ likes: post.likes, likedBy: post.likedBy });
+        // Send the updated likes count and isLiked status to the frontend
+        res.status(200).json({ likes: post.likes, isliked: isLiked });
     } catch (error) {
         console.error('Error updating likes:', error);
         res.status(500).json({ message: 'Error updating likes', error: error.message });
     }
 });
+        
+       
 
 
 // profile
