@@ -109,7 +109,7 @@ const PostDetails = () => {
       toast.success('Comment deleted successfully');
     } catch (error) {
       console.error('Error deleting comment:', error);
-      toast.error('Failed to delete comment');
+      toast.error('You are not author of this comment!');
     }
   };
 
