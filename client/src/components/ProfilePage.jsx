@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import {
-  FaFacebook,
-  FaInstagram,
-  FaTwitter,
-  FaLinkedin,
   FaUserEdit,
   FaKey,
 } from "react-icons/fa";
@@ -50,10 +46,15 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setProfileImage(reader.result); // Preview image
-      reader.readAsDataURL(file);
+  
+      reader.onloadend = () => {
+        setProfileImage({ url: reader.result }); // Directly store the base64 string for preview
+      };
+  
+      reader.readAsDataURL(file); // Convert the file to base64
     }
   };
+  
 
   const handleUploadClick = () => fileInputRef.current.click();
 
@@ -75,25 +76,32 @@ const ProfilePage = () => {
       formData.append("instagram", socialLinks.instagram || "");
       formData.append("twitter", socialLinks.twitter || "");
       formData.append("linkedin", socialLinks.linkedin || "");
-
+  
       if (fileInputRef.current.files[0]) {
-        formData.append("profilePic", fileInputRef.current.files[0]); // Profile picture
+        formData.append("profilePic", fileInputRef.current.files[0]); // Send image file to server
+        
       }
-
-      await axios.put("http://localhost:3000/profile", formData, {
+     
+      // Send the formData (including profile image) to the server
+      const response = await axios.put("http://localhost:3000/profile", formData, {
         headers: {
           "auth-token": token,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "multipart/form-data", // Ensure the content type is set for FormData
         },
       });
-
+  
+      // Handle successful update
       alert("Profile updated successfully!");
+      setProfileImage(response.data.profileImage.url); // Assuming the server returns the profile image URL
       setIsEditing(false);
+      window.location.reload();
+      
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error updating profile:", error.response?.data || error.message);
       alert("Failed to update profile.");
     }
   };
+  
 
   const handleSocialLinkClick = (platform) => {
     if (!isEditing) {
@@ -131,10 +139,10 @@ const ProfilePage = () => {
           {/* Profile Image */}
           <div style={styles.profileImageSection}>
             <label htmlFor="uploadImage" style={styles.imageLabel}>
-              {profileImage ? (
+              {profileImage && profileImage.url ? (
                 <img
-                  src={profileImage}
-                  alt="Profile"
+                  src={profileImage.url}
+                  alt="profile_image"
                   style={styles.profileImage}
                 />
               ) : (

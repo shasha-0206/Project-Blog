@@ -90,14 +90,14 @@ function Dashboard() {
           <div className="d-card w-auto">
             <div className="d-card-inner">
               <h4>Total Comments</h4>
-              <span class="material-symbols-outlined">comment</span>
+              <span className="material-symbols-outlined">comment</span>
             </div>
             <h2>{totalComments}</h2>
           </div>
           <div className="d-card w-auto">
             <div className="d-card-inner">
               <h4>Total Posts</h4>
-              <span class="material-symbols-outlined">post</span>
+              <span className="material-symbols-outlined">post</span>
             </div>
             <h2>{totalPosts}</h2>
           </div>
