@@ -61,15 +61,15 @@ const MyPosts = () => {
   }
 
   return (
-    <div className="container mb-2">
+    <div className="container mb-5">
       <Toaster />
-      <h3>My Posts</h3>
+      <h3 className='mt-3'>My Posts</h3>
       <div className="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
         {posts.length > 0 ? (
           posts.map((post) => (
             <div key={post._id} className="card col post-card index-card">
               <img
-                src={`data:image/jpeg;base64,${post.image}`}
+                src={post.image.url}
                 className="card-img-top"
                 alt="post_image"
                 style={{ height: '20rem', cursor: 'pointer' }}
@@ -82,7 +82,7 @@ const MyPosts = () => {
             </div>
           ))
         ) : (
-          <p>No posts found.</p> // Show a message if no posts are available
+          <h6 id='no-posts'>No posts found!</h6> // Show a message if no posts are available
         )}
       </div>
     </div>

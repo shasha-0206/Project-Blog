@@ -51,7 +51,7 @@ const Editor = () => {
     <div className="col-8 offset-2 mt-3 mb-3">
       <Toaster />
       <div className="d-flex justify-content-between align-items-center">
-        <h3>Upload a New Post</h3>
+        <h3 className='mt-2'>Upload a New Post</h3>
         <button
           className="btn btn-info submit-btn"
           onClick={() => navigate('/generate-ai')}
@@ -100,7 +100,6 @@ const Editor = () => {
 
         <button className="btn btn-dark add-btn" type="submit">Add</button>
       </form>
-
       {message && <p>{message}</p>}
     </div>
   );

@@ -6,13 +6,16 @@ import User from './models/User.js';
 import Post from './Models/Post.js';
 import cors from 'cors';
 import multer from 'multer';
-import fetchUser from './middleware/fetchUser.js'; 6
+import storage from './cloudConfig.js'; // Use the existing Cloudinary config
+
+
+import fetchUser from './middleware/fetchUser.js';
 import dotenv from 'dotenv';
 import { body, validationResult } from 'express-validator';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
+const jwt_secret = process.env.JWT_SECRET || 'default_secret_key';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,7 +36,7 @@ mongoose.connect(db_url)
 app.post('/signup', [
 
     // for valditaion of user input
-    body('username', 'Enter a valid name').isLength({ min: 3 }),
+    body('username', 'Username must be atleast 3 characters').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 })], async (req, res) => {
 
@@ -70,7 +73,7 @@ app.post('/signup', [
             // authentication
             try {
                 const data = { user: { id: user.id } };
-                const authtoken = jwt.sign(data, JWT_SECRET);
+                const authtoken = jwt.sign(data, jwt_secret);
                 success = true;
                 res.json({ success: success, authtoken: authtoken })
 
@@ -81,7 +84,7 @@ app.post('/signup', [
 
         } catch (error) {
             console.error("Signup error:", error);
-            res.status(500).json({ message: JWT_SECRET, error: error.message });
+            res.status(500).json({ message: jwt_secret, error: error.message });
         }
     });
 
@@ -116,9 +119,9 @@ app.post('/login', [
                 id: user.id
             }
         }
-        const authtoken = jwt.sign(data, JWT_SECRET);
+        const authtoken = jwt.sign(data, jwt_secret);
         success = true;
-        res.json({ success: success, authtoken: authtoken })
+        res.json({ success: success, authtoken: authtoken });
 
 
     } catch (error) {
@@ -127,30 +130,27 @@ app.post('/login', [
 });
 
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage: storage }); 
 
 app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
 
     // getting title and content
     const { title, content } = req.body;
 
-    // getting image from frontend
-    const imageFile = req.file;
+
     let success = false;
 
     // without three user cant post 
-    if (!title || !content || !imageFile) {
+    if (!title || !content || !req.file) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // converting image to string for saving into mongo
-    let imageBase64 = null;
-    if (imageFile) {
-        imageBase64 = imageFile.buffer.toString('base64');
-    }
-
+     //provided by Cloudinary
+     const { path: url, filename } = req.file;
+    
     const user = await User.findById(req.user.id);
+
 
     if (!user) {
         return res.status(500).json({ message: 'Failed to create post', error: error.message });
@@ -162,7 +162,7 @@ app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
             const newPost = new Post({
                 title,
                 content,
-                image: imageBase64,
+                image: {url,filename},
                 user: req.user.id
 
             });
@@ -170,11 +170,10 @@ app.post('/posts', fetchUser, upload.single('image'), async (req, res) => {
             await newPost.save();
             // post saved in mongo
 
-            res.status(201).json({ sucsess: success, message: 'Post created successfully', post: newPost });
+            res.status(201).json({ success: success, message: 'Post created successfully', post: newPost });
 
         } catch (error) {
-            console.error('Error creating post:', error);
-            res.status(500).json({ message: 'Failed to create post', error: error.message }); en
+            res.status(500).json({ message: 'Failed to create post', error: error.message });
         }
     }
 });
@@ -222,7 +221,6 @@ app.get('/posts', async (req, res) => {
     }
 });
 
-// for showing post details when clicked 
 app.get('/posts/:postId', async (req, res) => {
     const { postId } = req.params;
 
@@ -233,8 +231,7 @@ app.get('/posts/:postId', async (req, res) => {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        const originalImageUrl = `data:image/jpeg;base64,${post.image}` //  the image is stored as a base64 string
-
+        let originalImageUrl=post.image.url;
         // sending both the post and the originalImageUrl
         res.json({ post, likes: post.likes, originalImageUrl, isLiked: post.isLiked });
 
@@ -245,43 +242,41 @@ app.get('/posts/:postId', async (req, res) => {
 });
 
 
-// for editting post
-app.put('/posts/:postId', upload.single('image'), async (req, res) => {
-
-    // from body
-    const { title, content } = req.body;
-
-    // from url
-    const { postId } = req.params;
-
-    let imageBase64 = null;
-
-    // If an image is uploaded, convert it to base64
-    if (req.file) {
-        // buffers allow efficient handling of binary data directly in memory without converting it to other formats like strings or arrays
-        // we converting buffer to string 
-        imageBase64 = req.file.buffer.toString('base64');
-    }
-
+app.put('/posts/:postId', fetchUser, upload.single('image'), async (req, res) => {
     try {
-        const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-
-        post.title = title || post.title;
-        post.content = content || post.content;
-        post.image = imageBase64 || post.image;
-
-        // Save the updated post
-        await post.save();
-
-        res.status(200).json({ message: 'Post updated successfully', post });
-
+      const { postId } = req.params;
+  
+      // Find the post
+      let post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+      }
+  
+      // Update fields directly
+      post.title = req.body.title || post.title;
+      post.content = req.body.content || post.content;
+  
+      // Update the image if a new file is uploaded
+      if (req.file) {
+        const url = req.file.path;
+        const filename = req.file.filename;
+        post.image = { url, filename };
+      }
+  
+      // Save the updated post
+      await post.save();
+  
+      console.log("Post updated successfully:", post);
+  
+      // Send a successful response
+      return res.status(200).json({ message: 'Post updated successfully', post });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to update post', error: error.message });
+      console.error('Error during post update:', error);
+      res.status(500).json({ message: 'Failed to update post', error: error.stack });
     }
-});
+  });
+  
+
 
 // for deleting post
 app.delete('/posts/:postId', async (req, res) => {
@@ -312,14 +307,10 @@ app.post('/myposts', fetchUser, async (req, res) => {
             // sortinf in desc to show latest post first
             .sort({ createdAt: -1 });
 
-        if (!userPosts || userPosts.length === 0) {
-            return res.status(404).json({ message: 'No posts found for this user' });
-        }
-
         res.status(200).json({ message: 'User posts fetched successfully', posts: userPosts });
     } catch (error) {
         console.error('Error fetching user posts:', error);
-        res.status(500).json({ message: 'Failed to fetch user posts', error: error.message });
+        res.status(500).json({ message: 'Failed to fetch users', error: error.message });
     }
 });
 
@@ -366,19 +357,38 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
 });
 
 // DELETE Comment Route
+
 app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
     const { commentId } = req.params;
+    const userId = req.user.id; // Assume `fetchUser` sets `req.user.id`
+
     try {
-        // Find the post by its ID and remove the comment
-        const post = await Post.findOneAndUpdate(
-            { 'comments._id': commentId }, // Find post with the specific comment
-            { $pull: { comments: { _id: commentId } } }, // since comments are array we use pull to remove elements from it
-            { new: true } // Return the updated post
-        );
+        // Find the post containing the comment
+        const post = await Post.findOne({ 'comments._id': commentId });
+        const user = await User.findById(userId);
+
 
         if (!post) {
             return res.status(404).json({ message: 'Post or comment not found' });
         }
+
+        // Find the comment within the post
+        const comment = post.comments.id(commentId);
+
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // Check if the user is the post owner or the comment author
+        if (post.user.toString() !== userId && comment.username !== user.username) {
+            return res.status(403).json({ message: 'Unauthorized to delete this comment' });
+        }
+
+        // Remove the comment
+        post.comments.pull(commentId);
+
+        // Save the updated post
+        await post.save();
 
         res.json({ message: 'Comment deleted successfully', post });
     } catch (err) {
@@ -387,51 +397,51 @@ app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
     }
 });
 
+// Route to like/unlike a post
 app.post('/posts/like/:postId', fetchUser, async (req, res) => {
-
     const { postId } = req.params;
-    const userId = req.user.id;
-    try {
+    const userId = req.user.id; // Logged-in user's ID
+    let isLiked = true; // Default value for like status
 
+    try {
         const post = await Post.findById(postId);
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        post.likedBy = post.likedBy ? post.likedBy.filter(Boolean) : [];
         // Check if the user has already liked the post
-        // since likedby is array we can use includes to check if the user is already added in array or not
-
-        if (post.likedBy && post.likedBy.includes(userId)) {
-            // Unlike: Remove the user from likedBy array and decrement likes
-            post.likedBy = post.likedBy.filter((id) => id.toString() !== userId);
-
-            post.likes = Math.max(post.likes - 1, 0); // Prevent negative likes
-
+        if (post.likedBy.includes(userId)) {
+            post.likes = Math.max(0, post.likes - 1); // Decrement likes if already liked
+            post.likedBy = post.likedBy.filter(id => id !== userId); // Remove userId from likedBy array
+            isLiked = false; // Set isLiked to false (since user is unliking the post)
         } else {
-            // Like: Add the user to likedBy array and increment likes
-            post.likedBy = post.likedBy || [];
+            // Add userId to likedBy array and increment likes count
             post.likedBy.push(userId);
             post.likes += 1;
+            console.log('Before update:', post.likedBy);
+            console.log('Like response:', { likes: post.likes, isliked: isLiked });
+
+
         }
 
-        // Save the post
+        // Save the updated post
         await post.save();
 
-        res.status(200).json({ likes: post.likes, likedBy: post.likedBy });
+        // Send the updated likes count and isLiked status to the frontend
+        res.status(200).json({ likes: post.likes, isliked: isLiked });
     } catch (error) {
         console.error('Error updating likes:', error);
         res.status(500).json({ message: 'Error updating likes', error: error.message });
     }
 });
+        
+       
 
 
 // profile
-const storage2 = multer.memoryStorage();
-const upload2 = multer({ storage: storage2 });
 
-app.post('/profile', fetchUser, upload2.single('profilePic'), async (req, res) => {
+app.post('/profile', fetchUser, upload.single('profilePic'), async (req, res) => {
     try {
         // Fetch the user from the database
         const user = await User.findById(req.user.id);
@@ -445,11 +455,12 @@ app.post('/profile', fetchUser, upload2.single('profilePic'), async (req, res) =
             return res.status(400).json({ message: "Profile picture is required" });
         }
 
-        // Convert the image to Base64
-        const imageBase64 = imageFile.buffer.toString('base64');
+        //provided by Cloudinary
+        const { path: url, filename } = req.file;
 
-        // Update the user's profile picture
-        user.profileImage = imageBase64; // Assume `profileImage` is a string field in the User model
+        console.log(req.file);
+        // Update the user's profile picture in the database
+        user.profileImage = { url, filename };
         await user.save();
 
         res.status(200).json({
@@ -470,7 +481,7 @@ app.get('/profile', fetchUser, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.json(user);
+        res.json(user); 
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -479,23 +490,36 @@ app.get('/profile', fetchUser, async (req, res) => {
 // Update user profile
 app.put('/profile', fetchUser, upload.single('profilePic'), async (req, res) => {
     try {
-        const { username, bio, socialLinks } = req.body;
+        const { username, bio, facebook, instagram, twitter, linkedin } = req.body;
 
         // Update profile image if exists
-        let profileImage = req.body.profileImage;
+        let profileImage = {};
         if (req.file) {
-            profileImage = req.file.buffer.toString('base64'); // Convert to Base64
+            profileImage.url = req.file.path;
+            profileImage.filename=req.file.filename;
         }
 
         const updatedUser = await User.findByIdAndUpdate(
             req.user.id,
-            { username, bio, socialLinks, profileImage },
+            { username,
+              bio,
+              socialLinks:{facebook, instagram, twitter, linkedin},
+              ...(req.file && { profileImage }) // Update profileImage if new image is uploaded
+            }, 
             { new: true, runValidators: true }
         ).select('-password');
 
-        res.json(updatedUser);
+        res.json({
+            username: updatedUser.username,
+            bio: updatedUser.bio,
+            socialLinks: updatedUser.socialLinks,
+            profileImage: updatedUser.profileImage, // Send the updated profile image URL
+        });
+
+        
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 

@@ -5,23 +5,24 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     unique: true 
-  }, // Shared email field
+  },
   username: {
      type: String,
       unique: true
-     }, // Shared username field
+     },
   password: {
      type: String,
       required: true 
-    }, // Password from second schema
+    }, 
   bio: { 
     type: String,
      maxLength: 200 
-    }, // Optional bio from first schema
+    }, 
   profileImage: {
-     type: String,
-    }, // Stores image path from first schema
-  socialLinks: { // Social links from first schema
+     url: String,
+     filename: String,//to manage images in Cloudinary
+    }, 
+  socialLinks: { 
     facebook: String,
     instagram: String,
     twitter: String,

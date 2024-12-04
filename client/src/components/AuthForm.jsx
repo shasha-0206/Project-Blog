@@ -43,6 +43,14 @@ function AuthForm({ mode = 'login' }) {
                     window.location.href = '/';
                 }, 500);
             }
+            else if (json.errors) {
+                // Handle validation errors
+                json.errors.forEach((error) => {
+                    toast.error(error.msg); // Display each validation error
+                });
+            } else {
+                toast.error(json.message || 'An error occurred.');
+            }
 
         } catch (err) {
             if (err.response && err.response.data) {
