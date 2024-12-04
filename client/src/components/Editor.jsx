@@ -53,15 +53,12 @@ const Editor = () => {
         navigate('/signin');
     }
 }, []); 
-
-
-
   return (
-    <div className="col-8 offset-2 mt-3">
+    <div className="col-8 offset-2 mt-3 mb-3">
       {/* Used to render success and error messages in frontend */}
       <Toaster />
-      <h3>Upload a New Post</h3>
-      <form noValidate onSubmit={handleSubmit} className="needs-validation">
+      <h3 className='mt-2'>Upload a New Post</h3>
+      <form onSubmit={handleSubmit} novalidate className="needs-validation" enctype="multipart/form-data">
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
           <input
@@ -85,6 +82,7 @@ const Editor = () => {
             onChange={(e) => setContent(e.target.value)}
             required
           ></textarea>
+          <div class="invalid-feedback">Please input some content to post</div>
         </div>
 
         <div className="mb-3">
@@ -104,7 +102,7 @@ const Editor = () => {
       {/* Generate with AI Button */}
       <div className="mt-4">
         <button
-          className="btn btn-info"
+          className="btn btn-info submit-btn mb-3"
           onClick={() => navigate('/generate-ai')}
         >
           Generate with AI

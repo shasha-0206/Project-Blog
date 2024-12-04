@@ -75,25 +75,24 @@ const Home = () => {
   // for rendering load more button
   const hasMorePosts = posts.length < totalPosts;
   return (
-    <div className="container">
+    <div className="container mb-4 mt-3">
       < Toaster />
       <h3>All Posts</h3>
 
       <div className="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
         {posts.length > 0 ? (
           posts.map((post, index) => (
-            <div key={post._id} className="card col post-card">
+            <div key={post._id} className="card col post-card index-card">
               <img
-                src={`data:image/jpeg;base64,${post.image}`}
+                src={post.image.url}
                 className="card-img-top"
                 alt="post_image"
-                style={{ height: '20rem', cursor: 'pointer' }}
+                style={{ height: '20rem',cursor: 'pointer'}}
                 onClick={() => handlePostClick(post._id)}  // On click, navigate to the post details page
               />
               <div className="card-body" style={{ cursor: 'pointer' }} onClick={() => handlePostClick(post._id)}>
-                <h5 className="card-title">{post.title}</h5>
-                <p className="card-text">{post.content.substring(0, 100)}...</p>
-                <p className="card-text">Posted by: {post.username}</p>
+                <p className="card-text"><b>{post.title}</b><br /> by {post.username}</p>
+
               </div>
             </div>
           ))
@@ -115,7 +114,7 @@ const Home = () => {
           :
           hasMorePosts && <button
             onClick={handleLoadMore}
-            className="btn btn-primary"
+            className="btn btn-primary add-btn mb-3"
           >
             Load More
           </button>

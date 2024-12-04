@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import {
-  FaFacebook,
-  FaInstagram,
-  FaTwitter,
-  FaLinkedin,
   FaUserEdit,
   FaKey,
 } from "react-icons/fa";
@@ -50,10 +46,15 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setProfileImage(reader.result); // Preview image
-      reader.readAsDataURL(file);
+  
+      reader.onloadend = () => {
+        setProfileImage({ url: reader.result }); // Directly store the base64 string for preview
+      };
+  
+      reader.readAsDataURL(file); // Convert the file to base64
     }
   };
+  
 
   const handleUploadClick = () => fileInputRef.current.click();
 
@@ -75,25 +76,32 @@ const ProfilePage = () => {
       formData.append("instagram", socialLinks.instagram || "");
       formData.append("twitter", socialLinks.twitter || "");
       formData.append("linkedin", socialLinks.linkedin || "");
-
+  
       if (fileInputRef.current.files[0]) {
-        formData.append("profilePic", fileInputRef.current.files[0]); // Profile picture
+        formData.append("profilePic", fileInputRef.current.files[0]); // Send image file to server
+        
       }
-
-      await axios.put("http://localhost:3000/profile", formData, {
+     
+      // Send the formData (including profile image) to the server
+      const response = await axios.put("http://localhost:3000/profile", formData, {
         headers: {
           "auth-token": token,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "multipart/form-data", // Ensure the content type is set for FormData
         },
       });
-
+  
+      // Handle successful update
       alert("Profile updated successfully!");
+      setProfileImage(response.data.profileImage.url); // Assuming the server returns the profile image URL
       setIsEditing(false);
+      window.location.reload();
+      
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error updating profile:", error.response?.data || error.message);
       alert("Failed to update profile.");
     }
   };
+  
 
   const handleSocialLinkClick = (platform) => {
     if (!isEditing) {
@@ -112,13 +120,13 @@ const ProfilePage = () => {
           <h2>Settings</h2>
         </div>
         <div
-          style={styles.sidebarItem}
+          style={styles.sidebarItem} className="sidebarItem"
           onClick={() => setIsEditing(!isEditing)}
         >
           <FaUserEdit style={styles.icon} />
           <span>{isEditing ? "Cancel Edit" : "Edit Profile"}</span>
         </div>
-        <div style={styles.sidebarItem}>
+        <div className="sidebarItem" style={styles.sidebarItem}>
           <FaKey style={styles.icon} />
           <span>Change Password</span>
         </div>
@@ -131,10 +139,10 @@ const ProfilePage = () => {
           {/* Profile Image */}
           <div style={styles.profileImageSection}>
             <label htmlFor="uploadImage" style={styles.imageLabel}>
-              {profileImage ? (
+              {profileImage && profileImage.url ? (
                 <img
-                  src={profileImage}
-                  alt="Profile"
+                  src={profileImage.url}
+                  alt="profile_image"
                   style={styles.profileImage}
                 />
               ) : (
@@ -235,11 +243,13 @@ const styles = {
   },
   sidebar: {
     width: "300px",
-    backgroundColor: "#343a40",
-    color: "#ffffff",
+    backgroundColor: "#f8f9fa",
+    color: "#000",
     display: "flex",
     flexDirection: "column",
     padding: "20px",
+    marginBottom: "0.5rem",
+    border: "1px solid #e0e0e0"
   },
   sidebarItem: {
     display: "flex",
@@ -300,7 +310,7 @@ const styles = {
   uploadButton: {
     marginTop: "10px",
     padding: "8px 16px",
-    backgroundColor: "#007bff",
+    backgroundColor: "#4d718e",
     color: "#fff",
     border: "none",
     borderRadius: "4px",
@@ -351,7 +361,7 @@ const styles = {
   },
   updateButton: {
     padding: "10px 20px",
-    backgroundColor: "#28a745",
+    backgroundColor: "#4d8e8b",
     color: "#fff",
     border: "none",
     borderRadius: "4px",

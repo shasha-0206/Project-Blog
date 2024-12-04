@@ -28,7 +28,7 @@ const Feedback = () => {
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container mt-5 mb-5">
             <Toaster />
             <h2>Feedback Form</h2>
             <form ref={form} onSubmit={sendEmail}>
@@ -49,5 +49,6 @@ const Feedback = () => {
         </div>
     );
 };
+
 
 export default Feedback;

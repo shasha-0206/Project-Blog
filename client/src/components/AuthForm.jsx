@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; // Ensure useEffect is imported here
 import axios from 'axios';
 import { Toaster, toast } from "react-hot-toast";
+import { useNavigate } from 'react-router-dom';
 
 function AuthForm({ mode = 'login' }) {
     const [username, setUsername] = useState('');
@@ -61,12 +62,12 @@ function AuthForm({ mode = 'login' }) {
     };
 
     return (
-        <div className="row mt-3">
+        <div className={`row mt-5 mb-3 ${mode === 'signup' ? 'signup-mode' : 'login-mode'}`}>
             <Toaster />
             <h1 className="col-6 offset-3">{mode === 'signup' ? 'Signup on BlogBliss' : 'Login'}</h1>
 
-            <div className="col-8 offset-3 mt-3">
-                <form onSubmit={handleSubmit} className="needs-validation" noValidate>
+            <div className="col-8 offset-3 mt-3 mb-4">
+                <form onSubmit={handleSubmit} className="needs-validation mb-4" noValidate>
                     <div className="mb-3">
                         <label htmlFor="username" className="form-label">Username</label>
                         <input
@@ -113,8 +114,7 @@ function AuthForm({ mode = 'login' }) {
                             </span>
                         </div>
                     </div>
-
-                    <button type="submit" className="btn btn-success add-btn">
+                    <button type="submit" className="btn btn-success add-btn mb-5">
                         {mode === 'signup' ? 'Signup' : 'Login'}
                     </button>
                 </form>

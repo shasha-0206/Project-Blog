@@ -3,19 +3,26 @@ from flask_cors import CORS
 
 import requests
 
+from dotenv import load_dotenv
+import os
+
+# Load the .env file from the server folder
+load_dotenv(dotenv_path='server/.env')  # Adjust the path as needed
+
 app = Flask(__name__)
 
 # Enable CORS for all routes
 CORS(app)
 
 # Hugging Face API Key and URL
-HUGGING_FACE_API_KEY = "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"
-API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct"
+hugging_face_api_key= os.getenv('HUGGING_FACE_API_KEY')
+api_url =os.getenv('API_URL')
 
 # Function to get model response
 def getModelResponse(input_text_field, no_words, blog_style):
     headers = {
-        "Authorization": f"Bearer {HUGGING_FACE_API_KEY}"
+        "Authorization": f"Bearer {hugging_face_api_key}"
+
     }
     # Adjusted prompt to encourage more detailed responses and formatting
     prompt = f"""
@@ -31,7 +38,7 @@ def getModelResponse(input_text_field, no_words, blog_style):
     try:
         # Requesting the blog content
         response = requests.post(
-            API_URL, 
+            api_url, 
             headers=headers, 
             json={
                 "inputs": prompt, 
@@ -39,7 +46,7 @@ def getModelResponse(input_text_field, no_words, blog_style):
                     "max_new_tokens": no_words * 5  # Set to a large enough multiplier to get a 1500-word response
                 }
             },
-            timeout=60  # Increased timeout to 60 seconds
+            timeout=180 # Increased timeout to 180 seconds
         )
         response.raise_for_status()  # Raises exception for non-2xx responses
         response_data = response.json()

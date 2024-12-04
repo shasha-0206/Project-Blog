@@ -58,110 +58,6 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <Toaster position="top-right" />
-      <style>
-        {`
-          .dashboard-container {
-            display: grid;
-            grid-template-areas: 'sidebar main';
-            grid-template-columns: 260px 1fr;
-            height: 100vh;
-            font-family: 'Montserrat', sans-serif;
-            background-color: white;
-          }
-          #sidebar {
-            grid-area: sidebar;
-            background-color: #f8f9fa;
-            border-right: 1px solid #e0e0e0;
-            padding: 15px;
-            transition: transform 0.3s;
-          }
-          #sidebar.sidebar-responsive {
-            position: absolute;
-            z-index: 12;
-            transform: translateX(-100%);
-          }
-          .sidebar-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          .sidebar-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-          }
-          .sidebar-list-item {
-            padding: 12px 10px;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s;
-          }
-          .sidebar-list-item:hover {
-            background-color: #e9ecef;
-          }
-          .sidebar-list-item .icon {
-            margin-right: 10px;
-            font-size: 18px;
-          }
-          .sidebar-list-item a {
-            text-decoration: none;
-            color: #212529;
-            display: flex;
-            align-items: center;
-          }
-          .main-container {
-            grid-area: main;
-            padding: 20px;
-            overflow-y: auto;
-          }
-          .main-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-          }
-          .card {
-            background-color: #343a40;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: transform 0.3s;
-          }
-          .card:hover {
-            transform: translateY(-5px);
-          }
-          .card-inner {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            font-size: 16px;
-          }
-          .recent-comments {
-            margin-top: 20px;
-            background-color: #343a40;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-          }
-          .recent-comments table {
-            width: 100%;
-            margin-top: 10px;
-            border-collapse: collapse;
-          }
-          .recent-comments th, .recent-comments td {
-            padding: 8px;
-            border-bottom: 1px solid #495057;
-          }
-          .recent-comments th {
-            font-weight: 600;
-          }
-        `}
-      </style>
 
       {/* Sidebar */}
       <aside id="sidebar" className={openSidebarToggle ? 'sidebar-responsive' : ''}>
@@ -189,39 +85,41 @@ function Dashboard() {
 
       {/* Main Content */}
       <main className="main-container">
-        <h3>DASHBOARD</h3>
+        <h2 className="mb-3">Dashboard</h2>
         <div className="main-cards">
-          <div className="card">
-            <div className="card-inner">
-              <h4>TOTAL COMMENTS</h4>
-              <BsChatDotsFill />
+          <div className="d-card w-auto">
+            <div className="d-card-inner">
+              <h4>Total Comments</h4>
+              <span className="material-symbols-outlined">comment</span>
             </div>
             <h2>{totalComments}</h2>
           </div>
-          <div className="card">
-            <div className="card-inner">
-              <h4>TOTAL POSTS</h4>
-              <BsFillBellFill />
+          <div className="d-card w-auto">
+            <div className="d-card-inner">
+              <h4>Total Posts</h4>
+              <span className="material-symbols-outlined">post</span>
             </div>
             <h2>{totalPosts}</h2>
           </div>
         </div>
         <div className="recent-comments">
-          <h4>Recent Comments</h4>
-          <table>
-            <thead>
+          <h4 className='mt-1 mb-3'>Recent Comments</h4>
+          <table className="table table-striped table-bordered table-hover tbl">
+            <thead className="thead-light">
               <tr>
-                <th>Name</th>
-                <th>Comment</th>
-                <th>Date</th>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Date & Time</th>
               </tr>
             </thead>
             <tbody>
               {recentComments.map((comment, index) => (
                 <tr key={index}>
+                  <th scope="row">{index + 1}</th>
                   <td>{comment.username}</td>
                   <td>{comment.text}</td>
-                  <td>{new Date(comment.createdAt).toLocaleDateString()}</td>
+                  <td>{new Date(comment.createdAt).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
