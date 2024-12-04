@@ -124,7 +124,7 @@ const ProfilePage = () => {
           onClick={() => setIsEditing(!isEditing)}
         >
           <FaUserEdit style={styles.icon} />
-          <span>{isEditing ? "Cancel Edit" : "Edit Profile"}</span>
+          <span>{isEditing ? "Update Profile" : "Edit Profile"}</span>
         </div>
         <div className="sidebarItem" style={styles.sidebarItem}>
           <FaKey style={styles.icon} />
