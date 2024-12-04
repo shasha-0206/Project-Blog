@@ -3,7 +3,7 @@ import React from 'react';
 const Footer = () => {
   return (
     <> 
-    <div className="mb-0">
+    <div className="footer-container">
       <footer className="footer mb-0 pt-5">
         <div className="logo">
           <span id="name">
@@ -37,7 +37,7 @@ const Footer = () => {
             <li><a href="#">X</a></li>
             <li><a href="#">Instagram <i class="fab fa-instagram social-icon"></i></a></li>
             <li><a href="#">LinkedIn <i class="fab fa-linkedin social-icon"></i></a></li>
-            <li><a href="#">Github <i class="bi bi-github"></i></a></li>
+            <li><a href="https://github.com/ravikirankachiraju">Github <i class="bi bi-github"></i></a></li>
           </ul>
         </div>
       </footer>

@@ -32,7 +32,9 @@ body{
 
 
 /* footer */
-
+.footer-container{
+  margin-bottom: auto !important;
+}
 
 .footer {
     display: flex;
@@ -219,6 +221,11 @@ footer{
     background-color: #fff;
 
 }
+/* No posts */
+#no-posts{
+  margin-bottom: 27rem;
+  margin-top: 2rem;
+}
 /* Login page */
 .login-mode{
  padding-bottom: 4rem !important;
@@ -240,7 +247,8 @@ footer{
   padding: 15px;
   transition: transform 0.3s;
   height: auto;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 0.8rem;
 }
 #sidebar.sidebar-responsive {
   position: absolute;
@@ -322,6 +330,7 @@ footer{
   padding: 15px;
   border: solid 1px #dcdcdc;
   border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
 /* ProfilePage */

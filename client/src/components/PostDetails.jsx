@@ -144,7 +144,7 @@ const PostDetails = () => {
           <div className="col-8 mb-3"> <h3> {post.title} </h3></div><br />
           <div className="card border-0" style={{width:'40rem'}}>
             <img
-              src={`data:image/jpeg;base64,${post.image}`}
+              src={post.image.url}
               alt="post_image"
               className='card-img-top'
             />
@@ -209,7 +209,7 @@ const PostDetails = () => {
           {/* comments section */}
           <h4 className="mt-4">Comments</h4>
 
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center mb-3"> 
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -244,6 +244,7 @@ const PostDetails = () => {
                   borderRadius: '10px',
                   backgroundColor: '#f9f9f9',
                   boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                  marginBottom: '1rem'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>

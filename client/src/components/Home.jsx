@@ -75,7 +75,7 @@ const Home = () => {
   // for rendering load more button
   const hasMorePosts = posts.length < totalPosts;
   return (
-    <div className="container mb-3">
+    <div className="container mb-4 mt-3">
       < Toaster />
       <h3>All Posts</h3>
 
@@ -84,7 +84,7 @@ const Home = () => {
           posts.map((post, index) => (
             <div key={post._id} className="card col post-card index-card">
               <img
-                src={`data:image/jpeg;base64,${post.image}`}
+                src={post.image.url}
                 className="card-img-top"
                 alt="post_image"
                 style={{ height: '20rem',cursor: 'pointer'}}
@@ -114,7 +114,7 @@ const Home = () => {
           :
           hasMorePosts && <button
             onClick={handleLoadMore}
-            className="btn btn-primary add-btn"
+            className="btn btn-primary add-btn mb-3"
           >
             Load More
           </button>

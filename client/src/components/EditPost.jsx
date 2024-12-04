@@ -68,19 +68,21 @@ const EditPost = () => {
     }
 
     try {
-      await axios.put(`http://localhost:3000/posts/${postId}`, formData, {
+
+      const response=await axios.put(`http://localhost:3000/posts/${postId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+           'auth-token': localStorage.getItem('token'),
         },
       });
-
-      toast.success("Post Updated successfully")
+      
+      toast.success("Post Updated successfully");
       setTimeout(() => {
         navigate('/MyPosts'); // Redirect to the home page or posts list
-      }, 2000)
+      }, 500)
 
     } catch (err) {
-      console.error('Error updating post:', err);
+      console.error('Error updating post:',err.message);
       toast.error('Failed to update post. Please try again.');
     }
   };
@@ -127,8 +129,8 @@ const EditPost = () => {
           />
           {
             imagePreview ? (
-              <div className="mt-2">
-                <strong>New Image Preview:</strong>
+              <div className="mt-3">
+                <strong className='mt-2'>New Image Preview:</strong>
                 <br />
                 <img
                   src={imagePreview}
@@ -144,8 +146,8 @@ const EditPost = () => {
               </div>
             ) :
 
-              <div>
-                <strong>Original Post Image</strong>
+              <div className='mt-3'>
+                <strong className=''>Original Post Image</strong>
                 <br />
                 <img
                   src={OriginalImageUrl}
@@ -156,7 +158,7 @@ const EditPost = () => {
           }
         </div>
 
-        <button type="submit" className="btn btn-dark edit-btn mt-3">Save Changes</button>
+        <button type="submit" className="btn btn-dark edit-btn mt-3 mb-5">Save Changes</button>
       </form>
     </div>
   );
