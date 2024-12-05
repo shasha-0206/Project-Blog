@@ -274,7 +274,7 @@ app.put('/posts/:postId', fetchUser, upload.single('image'), async (req, res) =>
       console.error('Error during post update:', error);
       res.status(500).json({ message: 'Failed to update post', error: error.message });
     }
-  });
+  });  
   
 
 
@@ -347,7 +347,7 @@ app.post('/posts/comments/:postId', fetchUser, async (req, res) => {
             createdAt: new Date()
         });
 
-        await post.save();
+        await post.save({ timestamps: false });
 
         res.status(201).json({ message: 'Comment added successfully', comments: post.comments });
     } catch (error) {
@@ -388,7 +388,7 @@ app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
         post.comments.pull(commentId);
 
         // Save the updated post
-        await post.save();
+        await post.save({ timestamps: false });
 
         res.json({ message: 'Comment deleted successfully', post });
     } catch (err) {
@@ -426,7 +426,7 @@ app.post('/posts/like/:postId', fetchUser, async (req, res) => {
         }
 
         // Save the updated post
-        await post.save();
+        await post.save({ timestamps: false });
 
         // Send the updated likes count and isLiked status to the frontend
         res.status(200).json({ likes: post.likes, isliked: isLiked });

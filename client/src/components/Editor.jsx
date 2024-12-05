@@ -50,17 +50,15 @@ const Editor = () => {
   return (
     <div className="col-8 offset-2 mt-3 mb-3">
       <Toaster />
-      <div className="d-flex justify-content-between align-items-center">
         <h3 className='mt-2'>Upload a New Post</h3>
-        <button
-          className="btn btn-info submit-btn"
+
+      <form onSubmit={handleSubmit} noValidate className="needs-validation" encType="multipart/form-data">
+      <button
+          className="btn btn-info submit-btn form-control w-auto mt-2 mb-3"
           onClick={() => navigate('/generate-ai')}
         >
           Generate with AI
         </button>
-      </div>
-
-      <form onSubmit={handleSubmit} noValidate className="needs-validation" encType="multipart/form-data">
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
           <input
@@ -98,7 +96,7 @@ const Editor = () => {
           />
         </div>
 
-        <button className="btn btn-dark add-btn" type="submit">Add</button>
+        <button className="btn btn-dark add-btn mb-2" type="submit">Add</button>
       </form>
       {message && <p>{message}</p>}
     </div>

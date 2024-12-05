@@ -385,7 +385,7 @@ footer{
     border-color: #333 #333 transparent transparent; /* Changed white to dark gray */
     animation: rotation 1.5s linear infinite;
   }
-      
+
   @keyframes rotation {
     0% {
       transform: rotate(0deg);
