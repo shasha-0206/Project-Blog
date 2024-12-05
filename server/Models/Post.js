@@ -16,9 +16,6 @@ const postSchema = new mongoose.Schema({
             required: true,
         },
     },
-    createdAt: { 
-        type: Date, default: Date.now
-     },
     user: {
          type: mongoose.Schema.Types.ObjectId, ref: 'User' 
         },
@@ -35,7 +32,7 @@ const postSchema = new mongoose.Schema({
             createdAt: { type: Date, default: Date.now },
         },
     ], // Add comments field
-});
+},{timestamps: true});
 
 const Post = mongoose.model('Post', postSchema);
 export default Post;

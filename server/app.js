@@ -275,7 +275,7 @@ app.put('/posts/:postId', fetchUser, upload.single('image'), async (req, res) =>
       return res.status(200).json({ message: 'Post updated successfully', post });
     } catch (error) {
       console.error('Error during post update:', error);
-      res.status(500).json({ message: 'Failed to update post', error: error.stack });
+      res.status(500).json({ message: 'Failed to update post', error: error.message });
     }
   });
   
