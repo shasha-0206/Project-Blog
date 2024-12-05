@@ -155,6 +155,14 @@ const PostDetails = () => {
               <h5 class="card-title">Post Details</h5>
               <p className="card-text"> Posted by : {post.user.username ? post.user.username : 'Anonymous'}</p>
               <p className="card-text"> Posted on : {post.createdAt ? new Date(post.createdAt).toLocaleString() : "less than a minute"}</p>
+                {/* Conditional rendering for "Last updated on" */}
+                {post.updatedAt && post.createdAt && 
+                new Date(post.updatedAt).getTime() !== new Date(post.createdAt).getTime() && (
+                 <p className="card-text">
+                   Last updated on: {new Date(post.updatedAt).toLocaleString()}
+                 </p>
+                )}
+
 
               
               {
