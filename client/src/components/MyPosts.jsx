@@ -29,7 +29,7 @@ const MyPosts = () => {
       }
 
       // Make the API call to fetch posts
-      const response = await axios.post('http://localhost:3000/myposts', 
+      const response = await axios.post('https://blog-bliss2.onrender.com/myposts', 
         {},
         {
           headers: {
