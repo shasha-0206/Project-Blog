@@ -24,7 +24,7 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("https://blog-bliss2.onrender.com/profile", {
+        const response = await axios.get("https://blog-bliss2.onrender.com/profile", { 
           headers: { "auth-token": token },
         });
 
