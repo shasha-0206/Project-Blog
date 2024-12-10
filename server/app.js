@@ -6,7 +6,7 @@ import User from './Models/User.js';
 import Post from './Models/Post.js';
 import cors from 'cors';
 import multer from 'multer';
-import storage from './cloudConfig.js'; // Use the existing Cloudinary config
+import storage from './cloudConfig.js'; 
 
 
 import fetchUser from './middleware/fetchUser.js';
