@@ -54,7 +54,7 @@ const AIEditor = () => {
     setError("");
 
     try {
-      const response = await fetch("https://blog-bliss2-python.onrender.com/generate_blog", {
+      const response = await fetch("http://localhost:3000/generate_blog", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,7 +121,7 @@ const AIEditor = () => {
 
     try {
       // Send POST request with Authorization header
-      const response = await axios.post('https://blog-bliss2.onrender.com/posts', formData, {
+      const response = await axios.post('http://localhost:3000/posts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'auth-token':token, // Correctly send token as 'Bearer <token>'
