@@ -13,7 +13,6 @@ import AIEditor from "./components/AIEditor";
 import About from "./components/About";
 import Feedback from "./components/Feedback";
 import Dashboard from "./components/Dashboard";
-import PasswordChangeForm from "./components/PasswordChangeForm";
 
 const App = () => {
     return (
@@ -45,7 +44,6 @@ const AppContent = () => {
                 <Route path="/about" element={<About />} />
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/Dashboard" element={<Dashboard />} />
-                <Route path="/changepassword" element={<PasswordChangeForm />} />
             </Routes>
 
             <Footer />

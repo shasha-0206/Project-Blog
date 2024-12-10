@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Ensure useEffect is imported here
 import axios from 'axios';
-// API to display toast notifications in your React app
 import { Toaster, toast } from "react-hot-toast";
+import { useNavigate } from 'react-router-dom';
 
 function AuthForm({ mode = 'login' }) {
     const [username, setUsername] = useState('');
@@ -9,37 +9,51 @@ function AuthForm({ mode = 'login' }) {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    // onSubmit
+    // UseEffect example: Handling a redirect message
+    useEffect(() => {
+        const redirectMessage = localStorage.getItem('redirectMessage');
+        if (redirectMessage) {
+           
+            toast.error(redirectMessage);
+            localStorage.removeItem('redirectMessage');
+        }
+        const addpostsredirectmessage = localStorage.getItem('addpostsrm');
+        if(addpostsredirectmessage){
+            toast.error(addpostsredirectmessage);
+            localStorage.removeItem('addpostsrm')
+        }
+    }, []); // Empty dependency array ensures this runs only once when the component mounts
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const url = mode === 'signup' ? 'http://localhost:3000/signup' : 'http://localhost:3000/login';
+        const url = mode === 'signup' ? 'https://blog-bliss2.onrender.com/signup' : 'https://blog-bliss2.onrender.com/login';
 
         try {
-
-            // sending data to backend 
             const response = await axios.post(url, { username, email, password });
             const json = response.data;
-            
-            // success variable we sent from backend is being used here for authentication without any errors
-            if (json.success) {
 
-                // saving token and loggedin inside localstorage
+            if (json.success) {
                 localStorage.setItem('token', json.authtoken);
                 localStorage.setItem('isLoggedIn', 'true');
 
-                // Show success toast
                 toast.success(mode === 'signup' ? 'Signup successful!' : 'Login successful!');
 
-                // Redirect after .5 seconds
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 500);
             }
-            
+            else if (json.errors) {
+                // Handle validation errors
+                json.errors.forEach((error) => {
+                    toast.error(error.msg); // Display each validation error
+                });
+            } else {
+                toast.error(json.message || 'An error occurred.');
+            }
+
         } catch (err) {
             if (err.response && err.response.data) {
-                // Extract error message and show error toast
                 toast.error(err.response.data.message || 'An error occurred.');
             } else {
                 toast.error('Network error. Please try again later.');
@@ -48,17 +62,12 @@ function AuthForm({ mode = 'login' }) {
     };
 
     return (
-        <div className="row mt-3">
-            {/* used to render success and errors mssgs in frontend */}
+        <div className={`row mt-5 mb-3 ${mode === 'signup' ? 'signup-mode' : 'login-mode'}`}>
             <Toaster />
-            <h1 className="col-6 offset-3">
-                {mode === 'signup' ? 'Signup on BlogBliss' : 'Login'}
-            </h1>
+            <h1 className="col-6 offset-3">{mode === 'signup' ? 'Signup on BlogBliss' : 'Login'}</h1>
 
-            <div className="col-8 offset-3 mt-3">
-                <form onSubmit={handleSubmit} className="needs-validation" noValidate>
-
-                    {/* Username Field */}
+            <div className="col-8 offset-3 mt-3 mb-4">
+                <form onSubmit={handleSubmit} className="needs-validation mb-4" noValidate>
                     <div className="mb-3">
                         <label htmlFor="username" className="form-label">Username</label>
                         <input
@@ -73,7 +82,6 @@ function AuthForm({ mode = 'login' }) {
                         {mode === 'signup' && <div className="valid-feedback">Looks good!</div>}
                     </div>
 
-                    {/* Email Field (only for signup) */}
                     {mode === 'signup' && (
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label">Email</label>
@@ -89,13 +97,10 @@ function AuthForm({ mode = 'login' }) {
                         </div>
                     )}
 
-                    {/* Password Field */}
                     <div className="mb-3">
                         <label htmlFor="password" className="form-label">Password</label>
                         <div className="input-group">
                             <input
-
-                            // for pass visibility
                                 type={showPassword ? "text" : "password"}
                                 id="password"
                                 name="password"
@@ -104,21 +109,16 @@ function AuthForm({ mode = 'login' }) {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
-
-                            {/* eye icon */}
                             <span className="input-group-text" onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
                                 <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                             </span>
                         </div>
                     </div>
-
-                    {/* Submit Button */}
-                    <button type="submit" className="btn btn-success add-btn">
+                    <button type="submit" className="btn btn-success add-btn mb-5">
                         {mode === 'signup' ? 'Signup' : 'Login'}
                     </button>
                 </form>
             </div>
-
         </div>
     );
 }

@@ -22,7 +22,7 @@ const PostDetails = () => {
       try {
 
         // rendering the post using id
-        const response = await axios.get(`http://localhost:3000/posts/${postId}`);
+        const response = await axios.get(`https://blog-bliss2.onrender.com/posts/${postId}`);
         setPost(response.data.post);
         setComments(response.data.post.comments || []);
       } catch (err) {
@@ -38,7 +38,7 @@ const PostDetails = () => {
 
   const OnDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/posts/${postId}`);
+      await axios.delete(`https://blog-bliss2.onrender.com/posts/${postId}`);
       toast.success("Post deleted successfully");
 
       setTimeout(() => {
@@ -63,7 +63,7 @@ const PostDetails = () => {
         return;
       }
       
-      const response = await axios.post(`http://localhost:3000/posts/comments/${postId}`,
+      const response = await axios.post(`https://blog-bliss2.onrender.com/posts/comments/${postId}`,
         { text: commentText },
         { headers: { 'auth-token': token } }
       );
@@ -95,7 +95,7 @@ const PostDetails = () => {
       }
 
       // Send a DELETE request to the backend to delete the comment
-      await axios.delete(`http://localhost:3000/posts/comments/${commentId}`, {
+      await axios.delete(`https://blog-bliss2.onrender.com/posts/comments/${commentId}`, {
         headers: { 'auth-token': token }
       });
 
@@ -105,7 +105,7 @@ const PostDetails = () => {
       toast.success('Comment deleted successfully');
     } catch (error) {
       console.error('Error deleting comment:', error);
-      toast.error('Failed to delete comment');
+      toast.error('You are not author of this comment!');
     }
   };
 
@@ -113,55 +113,62 @@ const PostDetails = () => {
     <div className="container mt-4">
       <Toaster />
       {post ? (
-        <div className="p-3">
-          <div className="d-flex">
+        <div className="row mt-3">
+          <div className="col-8 mb-3"> <h3> {post.title} </h3></div><br />
+          <div className="card border-0" style={{width:'40rem'}}>
             <img
-              src={`data:image/jpeg;base64,${post.image}`}
-              alt="Post"
-              style={{
-                width: '600px',  
-                height: 'auto',
-                borderRadius: '8px',
-                marginRight: '20px'
-              }}
+              src={post.image.url}
+              alt="post_image"
+              className='card-img-top'
             />
-            <div className="flex-grow-1">
-              <h3>{post.title}</h3>
-              <p><strong>Author:</strong> {post.user.username ? post.user.username : 'Unknown'}</p>
-              <p><strong>Posted on:</strong> {post.createdAt ? new Date(post.createdAt).toLocaleString() : "less than a minute"}</p>
+            </div>
+            <div className="card ms-auto border-0" style={{width:'40rem'}}>
+              <div className="card-body">
 
+              <h5 class="card-title">Post Details</h5>
+              <p className="card-text"> Posted by : {post.user.username ? post.user.username : 'Anonymous'}</p>
+              <p className="card-text"> Posted on : {post.createdAt ? new Date(post.createdAt).toLocaleString() : "less than a minute"}</p>
+                {/* Conditional rendering for "Last updated on" */}
+                {post.updatedAt && post.createdAt && 
+                new Date(post.updatedAt).getTime() !== new Date(post.createdAt).getTime() && (
+                 <p className="card-text">
+                   Last updated on: {new Date(post.updatedAt).toLocaleString()}
+                 </p>
+                )}
+
+
+              
               {
                 isFromMyPosts ?
-                  <div className="d-flex mt-2">
+                  <div className="btns">
                     <button
                       onClick={OnEdit}
-                      className="btn btn-success mr-2"
+                      className="btn btn-dark col-0.5 offset-3 edit-btn ms-0"
                       style={{ padding: '8px 16px' }}
                     >
                       Edit
-                    </button>
+                    </button> <br />
                     <button
                       onClick={OnDelete}
-                      className="btn btn-danger"
-                      style={{ padding: '8px 16px', marginLeft: '10px' }}
+                      className="btn btn-dark offset-3 delete-btn ms-0"
                     >
                       Delete
                     </button>
                   </div> : ""
 
               }
-
+              </div>
             </div>
 
+          
+          <div className="mt-3 post-content">
+            <p>{post.content}</p>
           </div>
-          <p className="mt-4" style={{ color: '#333', fontSize: '16px', lineHeight: '1.6' }}>
-            {post.content}
-          </p>
-
+    
           {/* comments section */}
           <h4 className="mt-4">Comments</h4>
 
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center mb-3"> 
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -173,7 +180,7 @@ const PostDetails = () => {
 
             <button
               onClick={() => handleAddComment(newComment)}
-              className="btn btn-primary d-flex align-items-center"
+              className="btn btn-primary d-flex align-items-center submit-btn"
               style={{ borderRadius: '10px', padding: '10px 20px' }} // Rounded corners
             >
               <i className="fas fa-paper-plane me-2"></i> Post
@@ -196,6 +203,7 @@ const PostDetails = () => {
                   borderRadius: '10px',
                   backgroundColor: '#f9f9f9',
                   boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                  marginBottom: '1rem'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
