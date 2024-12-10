@@ -387,46 +387,6 @@ app.delete('/posts/comments/:commentId', fetchUser, async (req, res) => {
     }
 });
 
-app.post('/posts/like/:postId', fetchUser, async (req, res) => {
-
-    const { postId } = req.params;
-    const userId = req.user.id;
-    try {
-
-        const post = await Post.findById(postId);
-
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-
-        post.likedBy = post.likedBy ? post.likedBy.filter(Boolean) : [];
-        // Check if the user has already liked the post
-        // since likedby is array we can use includes to check if the user is already added in array or not
-
-        if (post.likedBy && post.likedBy.includes(userId)) {
-            // Unlike: Remove the user from likedBy array and decrement likes
-            post.likedBy = post.likedBy.filter((id) => id.toString() !== userId);
-
-            post.likes = Math.max(post.likes - 1, 0); // Prevent negative likes
-
-        } else {
-            // Like: Add the user to likedBy array and increment likes
-            post.likedBy = post.likedBy || [];
-            post.likedBy.push(userId);
-            post.likes += 1;
-        }
-
-        // Save the post
-        await post.save();
-
-        res.status(200).json({ likes: post.likes, likedBy: post.likedBy });
-    } catch (error) {
-        console.error('Error updating likes:', error);
-        res.status(500).json({ message: 'Error updating likes', error: error.message });
-    }
-});
-
-
 // profile
 const storage2 = multer.memoryStorage();
 const upload2 = multer({ storage: storage2 });
