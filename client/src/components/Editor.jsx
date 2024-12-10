@@ -47,69 +47,64 @@ const Editor = () => {
   }, []); 
 
   return (
-      <div className="container mt-3 mb-3">
-      <Toaster />
-      <h3 className="col-12 col-md-8 offset-md-2">Upload a New Post</h3>
+     <div className={"row mt-5 mb-3" `${mode === 'signup' ? 'signup-mode' : 'login-mode'}`}>
+            <Toaster />
+            <h1 className="col-6 offset-3">{mode === 'signup' ? 'Signup on BlogBliss' : 'Login'}</h1>
 
-      <form onSubmit={handleSubmit} noValidate className="needs-validation" encType="multipart/form-data">
-        <button
-          className="btn btn-info submit-btn form-control mb-2"
-          onClick={() => navigate('/generate-ai')}
-        >
-          Generate with AI
-        </button>
+            <div className="col-8 offset-3 mt-3 mb-4">
+                <form onSubmit={handleSubmit} className="needs-validation mb-4" noValidate>
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            className="form-control"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                        {mode === 'signup' && <div className="valid-feedback">Looks good!</div>}
+                    </div>
 
-        <div className="row mb-3">
-          <div className="col-12 col-md-8 offset-md-2">
-            <label htmlFor="title" className="form-label">Title</label>
-            <input
-              type="text"
-              name="post[title]"
-              placeholder="Add a catchy title"
-              className="form-control"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
+                    {mode === 'signup' && (
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                className="form-control"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
+                    )}
+
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <div className="input-group">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                className="form-control"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <span className="input-group-text" onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}>
+                                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                            </span>
+                        </div>
+                    </div>
+                    <button type="submit" className="btn btn-success add-btn mb-5">
+                        {mode === 'signup' ? 'Signup' : 'Login'}
+                    </button>
+                </form>
+            </div>
         </div>
-
-        <div className="row mb-3">
-          <div className="col-12 col-md-8 offset-md-2">
-            <label htmlFor="content" className="form-label">Content</label>
-            <textarea
-              name="post[content]"
-              className="form-control"
-              rows="8"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-            ></textarea>
-            <div className="invalid-feedback">Please input some content to post</div>
-          </div>
-        </div>
-
-        <div className="row mb-3">
-          <div className="col-12 col-md-8 offset-md-2">
-            <label htmlFor="image" className="form-label">Upload Image</label>
-            <input
-              type="file"
-              name="post[image]"
-              className="form-control"
-              onChange={(e) => setImage(e.target.files[0])}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-12 col-md-8 offset-md-2">
-            <button className="btn btn-dark add-btn mb-2" type="submit">Add</button>
-          </div>
-        </div>
-      </form>
-
-    </div>
   );
 };
 
