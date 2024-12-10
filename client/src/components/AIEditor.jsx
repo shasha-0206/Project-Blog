@@ -54,9 +54,7 @@ const AIEditor = () => {
     setError("");
 
     try {
-
-      const response = await fetch("http://localhost:8501/generate_blog", {
-
+      const response = await fetch("https://blog-bliss2-python.onrender.com/generate_blog", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -123,8 +121,7 @@ const AIEditor = () => {
 
     try {
       // Send POST request with Authorization header
-      const response = await axios.post('http://localhost:3000/posts', formData, {
-
+      const response = await axios.post('https://blog-bliss2.onrender.com/posts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'auth-token':token, // Correctly send token as 'Bearer <token>'
@@ -171,7 +168,6 @@ const AIEditor = () => {
 
   return (
 
-
       <div className="col-8 offset-3 mt-4">
         <h3 className="mt-2">Generate a Blog Post</h3>
         <form onSubmit={handleGenerateBlog} novalidate className="needs-validation" enctype="multipart/form-data">
@@ -179,7 +175,6 @@ const AIEditor = () => {
             <label htmlFor="title" className="form-label">Title</label>
             <input
               type="text"
-
               className="form-control w-75"
               placeholder="Add a catchy title"
               value={title}
@@ -284,9 +279,7 @@ const AIEditor = () => {
           </button>
         </div>
       </div>
-
   );
 };
 
 export default AIEditor;
-
