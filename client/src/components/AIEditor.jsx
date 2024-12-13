@@ -54,7 +54,7 @@ const AIEditor = () => {
     setError("");
 
     try {
-      const response = await fetch("https://blog-bliss.onrender.com/generate_blog", {
+      const response = await fetch("https://blog-python-bx6p.onrender.com/generate_blog", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
