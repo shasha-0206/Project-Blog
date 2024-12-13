@@ -22,7 +22,7 @@ const PostDetails = () => {
       try {
 
         // rendering the post using id
-        const response = await axios.get(`http://localhost:3000/posts/${postId}`);
+        const response = await axios.get(`https://blog-bliss.onrender.com/posts/${postId}`);
         setPost(response.data.post);
         setComments(response.data.post.comments || []);
       } catch (err) {
@@ -38,7 +38,7 @@ const PostDetails = () => {
 
   const OnDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/posts/${postId}`);
+      await axios.delete(`https://blog-bliss.onrender.com/posts/${postId}`);
       toast.success("Post deleted successfully");
 
       setTimeout(() => {
@@ -63,7 +63,7 @@ const PostDetails = () => {
         return;
       }
       
-      const response = await axios.post(`http://localhost:3000/posts/comments/${postId}`,
+      const response = await axios.post(`https://blog-bliss.onrender.com/posts/comments/${postId}`,
         { text: commentText },
         { headers: { 'auth-token': token } }
       );
@@ -95,7 +95,7 @@ const PostDetails = () => {
       }
 
       // Send a DELETE request to the backend to delete the comment
-      await axios.delete(`http://localhost:3000/posts/comments/${commentId}`, {
+      await axios.delete(`https://blog-bliss.onrender.com/posts/comments/${commentId}`, {
         headers: { 'auth-token': token }
       });
 
