@@ -24,7 +24,7 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/profile", { 
+        const response = await axios.get("https://blog-bliss.onrender.com/profile", { 
           headers: { "auth-token": token },
         });
 
@@ -83,7 +83,7 @@ const ProfilePage = () => {
       }
      
       // Send the formData (including profile image) to the server
-      const response = await axios.put("http://localhost:3000/profile", formData, {
+      const response = await axios.put("https://blog-bliss.onrender.com/profile", formData, {
         headers: {
           "auth-token": token,
           "Content-Type": "multipart/form-data", // Ensure the content type is set for FormData
