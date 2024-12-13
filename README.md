@@ -12,6 +12,7 @@ AI-Powered Content Generation: Integrates the LLaMA 3.2 3B model for generating 
 User-Friendly Interface: Simple and functional UI to ensure ease of use.
 
 Technology Stack 🛠️
+
 Frontend:
 React.js: For building a dynamic and responsive user interface.
 Bootstrap: For styling and layout management.
