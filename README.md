@@ -1,10 +1,17 @@
 Enhancing Blog Content Creation with AI-Powered Text Generation ✨
 
+![image](https://github.com/user-attachments/assets/6e94f4d8-5417-42d7-a2c1-4fbd102605b8)
+
+
 Project Overview 📊
 This project is a cutting-edge blog platform designed to assist users in creating, reading, updating, and deleting blog posts (CRUD functionality). Leveraging advanced Natural Language Processing (NLP) models, the platform integrates the LLaMA 3.2 3B model for generating and summarizing content. With an intuitive user interface, it aims to simplify the blog creation process while maintaining high-quality content generation.
 
 Objective 🎯
 To develop an AI-powered blog platform that enhances user productivity and creativity by providing automated content generation and summarization tools.
+
+![image](https://github.com/user-attachments/assets/3d97baa2-6e4c-47d0-bb40-83c53fcec965)
+![image](https://github.com/user-attachments/assets/bf0c30f7-558d-4be1-90a6-65fc1d712ec7)
+![image](https://github.com/user-attachments/assets/a1d474a1-bb79-49e9-9a1a-e8f4b49700a6)
 
 Key Features 🔧
 Blog Management: Full CRUD functionality to create, read, update, and delete blog posts.
